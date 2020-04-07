@@ -16,6 +16,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity android:name=".DataActivity" ></activity>
+        <activity android:name=".MainInformationActivity"></activity>
+        <activity android:name=".RemoteActivity"></activity>
+        <activity android:name=".VisualizeActivity"></activity>
+
     </application>
 
 </manifest>
