@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">DorisApp</string>
+    <string name="start_button">Start</string>
+    <string name="park_button">Park</string>
     <string name="visualized_route_button">Visualized route</string>
     <string name="route_in_data_button">Route in data</string>
     <string name="collisionsButton">Collisions</string>
