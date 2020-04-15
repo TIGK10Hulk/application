@@ -5,4 +5,8 @@
     <string name="visualized_route_button">Visualized route</string>
     <string name="route_in_data_button">Route in data</string>
     <string name="collisionsButton">Collisions</string>
+    <string name="arrow_pointing_upward">arrow pointing upward</string>
+    <string name="arrow_pointing_downward">arrow pointing downward</string>
+    <string name="arrow_pointing_to_the_left">arrow pointing to the left</string>
+    <string name="arrow_pointing_to_the_right">arrow pointing to the right</string>
 </resources>
