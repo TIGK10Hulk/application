@@ -24,7 +24,9 @@
         <activity android:name=".DataActivity" ></activity>
         <activity android:name=".MainInformationActivity"></activity>
         <activity android:name=".RemoteActivity"></activity>
-        <activity android:name=".VisualizeActivity"></activity>
+        <activity android:name=".VisualizeActivity">
+
+        </activity>
 
         <service
             android:name=".BluetoothHandler"
