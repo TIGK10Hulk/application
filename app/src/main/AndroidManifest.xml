@@ -26,6 +26,14 @@
         <activity android:name=".RemoteActivity"></activity>
         <activity android:name=".VisualizeActivity"></activity>
 
+        <service
+            android:name=".BluetoothHandler"
+            android:enabled="true"
+            android:exported="true"
+            />
+
+
+
     </application>
 
 </manifest>
