@@ -23,14 +23,11 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".DataActivity" />
-        <activity android:name=".MainInformationActivity" />
-        <activity android:name=".RemoteActivity" />
-        <activity android:name=".VisualizeActivity" />
+        <activity android:name=".DataActivity" android:theme="@style/AppTheme.NoActionBar"/>
+        <activity android:name=".MainInformationActivity" android:theme="@style/AppTheme.NoActionBar"/>
+        <activity android:name=".RemoteActivity" android:theme="@style/AppTheme.NoActionBar"/>
+        <activity android:name=".VisualizeActivity" android:theme="@style/AppTheme.NoActionBar"/>
 
-        <activity android:name=".NavDrawerActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
         <service
             android:name=".BluetoothHandler"
             android:enabled="true"

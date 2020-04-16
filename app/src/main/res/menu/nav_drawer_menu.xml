@@ -9,20 +9,19 @@
             android:id="@+id/nav_remote_activity"
             android:title="Remote Activity"/>
         <item
-            android:id="@+id/nav_friends"
-            android:title="Friends"/>
+            android:id="@+id/nav_data_activity"
+            android:title="Data Activity"/>
+        <item
+            android:id="@+id/nav_visualize_activity"
+            android:title="Visualize Activity"/>
+        <item
+            android:id="@+id/nav_main_information_activity"
+            android:title="Main Information Activity"/>
+
+        <item
+            android:id="@+id/nav_settings"
+            android:title="Settings"
+            />
     </group>
 
-
-    <item android:title="Account Settings">
-        <menu>
-            <item
-                android:id="@+id/nav_update"
-                android:title="Update Profile"
-                />
-            <item
-                android:id="@+id/nav_logout"
-                android:title="Sign Out"/>
-        </menu>
-    </item>
 </menu>

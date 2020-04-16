@@ -9,7 +9,10 @@ class MainInformationActivity: AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main_information)
+        setContentView(R.layout.activity_nav_drawer)
+
+        initializeContentView(R.layout.activity_main_information, findViewById(android.R.id.content), layoutInflater) //Adds activity_main_information.xml to current view
+        initializeDrawerListeners(R.layout.activity_main_information, findViewById(android.R.id.content), this) //Initialize button listeners for navigation system
     }
 
 }
