@@ -9,4 +9,5 @@
     <string name="arrow_pointing_downward">arrow pointing downward</string>
     <string name="arrow_pointing_to_the_left">arrow pointing to the left</string>
     <string name="arrow_pointing_to_the_right">arrow pointing to the right</string>
+    <string name="driving_status_default_text_view">Idle</string>
 </resources>
