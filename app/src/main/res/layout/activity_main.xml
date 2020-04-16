@@ -7,21 +7,23 @@
     tools:context=".MainActivity">
 
     <Button
-        android:id="@+id/startButton"
+        android:id="@+id/startAndStopButton"
         android:layout_width="190dp"
         android:layout_height="60dp"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="500dp"
-        android:text="@string/start_button" />
+        android:text="@string/start_button"
+        android:onClick="startAndStop"/>
 
     <Button
         android:id="@+id/parkButton"
         android:layout_width="190dp"
         android:layout_height="60dp"
-        android:layout_below="@id/startButton"
+        android:layout_below="@id/startAndStopButton"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="30dp"
-        android:text="@string/park_button" />
+        android:layout_marginTop="10dp"
+        android:text="@string/park_button"
+        android:onClick="park"/>
 
     <TextView
         android:id="@+id/drivingStatusTextView"
@@ -29,5 +31,6 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="250dp"
         android:layout_centerHorizontal="true"
-        android:text="TextView" />
+        android:textSize="30sp"
+        android:text="@string/driving_status_default_text_view" />
 </RelativeLayout>
