@@ -11,7 +11,10 @@ class VisualizeActivity: AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_visualize)
+        setContentView(R.layout.activity_nav_drawer)
+
+        initializeContentView(R.layout.activity_visualize, findViewById(android.R.id.content), layoutInflater) //Adds activity_main.xml to current view
+        initializeDrawerListeners(R.layout.activity_visualize, findViewById(android.R.id.content), this) //Initialize button listeners for navigation system
 
         var x: Double = 0.0
         var y: Double = 0.0
@@ -29,11 +32,10 @@ class VisualizeActivity: AppCompatActivity() {
         }
 
         graph.addSeries(series)
-
-
+        // val series: LineGraphSeries<DataPoint> = LineGraphSeries {DataPoint(0.1, 0.2)}
     }
 
-   // val series: LineGraphSeries<DataPoint> = LineGraphSeries {DataPoint(0.1, 0.2)}
+
 
 
 }

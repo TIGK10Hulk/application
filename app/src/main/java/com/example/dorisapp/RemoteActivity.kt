@@ -14,13 +14,17 @@ class RemoteActivity: AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_remote)
+        setContentView(R.layout.activity_nav_drawer)
+
+        initializeContentView(R.layout.activity_remote, findViewById(android.R.id.content), layoutInflater) //Adds activity_remote.xml to current view
+        initializeDrawerListeners(R.layout.activity_remote, findViewById(android.R.id.content), this) //Initialize button listeners for navigation system
 
         //Initiate Service, start it and then bind to it.
         val serviceClass = BluetoothHandler::class.java
         val intent = Intent(applicationContext, serviceClass)
         startService(intent)
         bindService(intent, myConnection, Context.BIND_AUTO_CREATE )
+
     }
     
    //Returns an object used to access public methods of the bluetooth service

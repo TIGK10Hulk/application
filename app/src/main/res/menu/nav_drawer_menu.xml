@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" android:layout_height="match_parent" android:layout_width="match_parent">
+
+    <group>
+        <item
+            android:id="@+id/nav_main_activity"
+            android:title="Main Activity"/>
+        <item
+            android:id="@+id/nav_remote_activity"
+            android:title="Remote Activity"/>
+        <item
+            android:id="@+id/nav_data_activity"
+            android:title="Data Activity"/>
+        <item
+            android:id="@+id/nav_visualize_activity"
+            android:title="Visualize Activity"/>
+        <item
+            android:id="@+id/nav_main_information_activity"
+            android:title="Main Information Activity"/>
+
+        <item
+            android:id="@+id/nav_settings"
+            android:title="Settings"
+            />
+    </group>
+
+</menu>

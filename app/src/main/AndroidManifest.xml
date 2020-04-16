@@ -21,12 +21,10 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".DataActivity" ></activity>
-        <activity android:name=".MainInformationActivity"></activity>
-        <activity android:name=".RemoteActivity"></activity>
-        <activity android:name=".VisualizeActivity">
-
-        </activity>
+        <activity android:name=".DataActivity" android:theme="@style/AppTheme.NoActionBar"/>
+        <activity android:name=".MainInformationActivity" android:theme="@style/AppTheme.NoActionBar"/>
+        <activity android:name=".RemoteActivity" android:theme="@style/AppTheme.NoActionBar"/>
+        <activity android:name=".VisualizeActivity" android:theme="@style/AppTheme.NoActionBar"/>
 
         <service
             android:name=".BluetoothHandler"
