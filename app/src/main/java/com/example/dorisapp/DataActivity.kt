@@ -1,14 +1,10 @@
 package com.example.dorisapp
 
-import android.content.Context
 import android.os.Bundle
-import android.view.View
-import android.view.ViewGroup
-import android.widget.BaseAdapter
-import android.widget.ListView
-import android.widget.TextView
+import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
-import kotlinx.android.synthetic.main.activity_data.*
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 
 class DataActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -18,36 +14,18 @@ class DataActivity : AppCompatActivity() {
         initializeContentView(R.layout.activity_data, findViewById(android.R.id.content), layoutInflater) //Adds activity_data.xml to current view
         initializeDrawerListeners(R.layout.activity_data, findViewById(android.R.id.content), this) //Initialize button listeners for navigation system
 
-        val listView = findViewById<ListView>(R.id.dataListView)
+        val dataRecycler = findViewById(R.id.dataRecycler) as RecyclerView
 
-        listView.adapter = AllDataAdapter(this)
-    }
+        dataRecycler.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
+        val coordinateDataItem = ArrayList<CoordinateData>()
 
-    private class AllDataAdapter(context: Context): BaseAdapter() {
+        coordinateDataItem.add(CoordinateData("X: 1", "Y: 5", "Collision: No"))
+        coordinateDataItem.add(CoordinateData("X: 3", "Y: 6", "Collision: Yes"))
+        coordinateDataItem.add(CoordinateData("X: 2", "Y: 4", "Collision: No"))
 
-        private val mContext: Context
 
-        init {
-            mContext = context
-        }
-        //amount of views in list
-        override fun getCount(): Int {
-            return 5 //just 5 rows, for test
-        }
+        val adapter = DataListAdapter (coordinateDataItem)
 
-        override fun getItemId(position: Int): Long {
-            return position.toLong()
-        }
-
-        override fun getItem(position: Int): Any {
-            return "Test string"
-        }
-
-        override fun getView(position: Int, convertView: View?, viewGroup: ViewGroup?): View {
-            val textView = TextView(mContext)
-            textView.text = "here is a listview row"
-            return textView
-        }
-
+        dataRecycler.adapter = adapter
     }
 }
