@@ -10,6 +10,7 @@
         android:id="@+id/startButton"
         android:layout_width="190dp"
         android:layout_height="60dp"
+        android:onClick="printStuff"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="500dp"
         android:text="@string/start_button" />

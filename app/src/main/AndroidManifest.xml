@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.example.dorisapp">
 
     <uses-permission android:name="android.permission.INTERNET"/>
@@ -13,19 +14,23 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        <activity android:name=".MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.MAIN"/>
 
-                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
 
-        <activity android:name=".DataActivity" ></activity>
-        <activity android:name=".MainInformationActivity"></activity>
-        <activity android:name=".RemoteActivity"></activity>
-        <activity android:name=".VisualizeActivity"></activity>
+        <activity android:name=".DataActivity" />
+        <activity android:name=".MainInformationActivity" />
+        <activity android:name=".RemoteActivity" />
+        <activity android:name=".VisualizeActivity" />
 
+        <activity android:name=".NavDrawerActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
         <service
             android:name=".BluetoothHandler"
             android:enabled="true"
