@@ -31,7 +31,8 @@ class MainActivity : AppCompatActivity() {
         var statusText : TextView = findViewById(R.id.drivingStatusTextView)
 
         if (start) {
-            examplePostRequest(this)
+            /*sendCoordinate(this)*/
+            getCoordinate(this)
             var startButton : Button = findViewById(R.id.startAndStopButton)
             startButton.text = "Stop"
             statusText.text = "Driving"
