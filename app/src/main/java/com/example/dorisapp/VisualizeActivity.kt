@@ -1,8 +1,14 @@
 package com.example.dorisapp
 
 import android.app.DownloadManager
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
 import android.os.Handler
+import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import com.android.volley.Request
 import com.android.volley.Response
@@ -15,10 +21,16 @@ import com.beust.klaxon.Klaxon
 import com.jjoe64.graphview.GraphView
 import com.jjoe64.graphview.series.DataPoint
 import com.jjoe64.graphview.series.LineGraphSeries
+import kotlinx.android.synthetic.main.activity_visualize.*
 import org.json.JSONArray
+import org.json.JSONObject
 import kotlin.math.sinh
 
 class VisualizeActivity: AppCompatActivity() {
+
+    var image: ImageView = findViewById(R.id.chart)
+    var bitMap : Bitmap = Bitmap.createBitmap(image.width, image.height, Bitmap.Config.ARGB_8888)
+    private val paint : Paint = Paint(Color.BLACK)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,42 +39,91 @@ class VisualizeActivity: AppCompatActivity() {
         initializeContentView(R.layout.activity_visualize, findViewById(android.R.id.content), layoutInflater) //Adds activity_main.xml to current view
         initializeDrawerListeners(R.layout.activity_visualize, findViewById(android.R.id.content), this) //Initialize button listeners for navigation system
 
-
+        getListOfCordsForGraph()
 
         var handler = Handler()
-        var interval : Long = 1000;
-
-        handler.postDelayed(Runnable {
-            getCordsForGraph()
-        }, interval)
-
-
+        handler.postDelayed(Runnable{
+            @Override
+            fun run() {
+                getLatestCordsForGraph()
+                handler.postDelayed({  }, 1000)
+            }
+        }, 1000)
     }
 
-    private fun getCordsForGraph() {
+    private fun getLatestCordsForGraph() {
 
-        var graph : GraphView = findViewById(R.id.graph)
-        var series : LineGraphSeries<DataPoint> = LineGraphSeries<DataPoint>()
-
-        var x : Double = 0.0
-        var y : Double = 0.0
+        var x : Float = 0.0F
+        var y : Float = 0.0F
+        var previousX : Float = 0.0F
+        var previousY : Float = 0.0F
 
         var queue = Volley.newRequestQueue(this)
-        var url = "https://us-central1-hulkdoris-4c6eb.cloudfunctions.net/api/positions"
+        var url = "https://us-central1-hulkdoris-4c6eb.cloudfunctions.net/api/positions/latest"
 
         val jsonObjectRequest = JsonObjectRequest(Request.Method.GET, url, null,
 
             // On Success
-            Response.Listener { result -> result
+            Response.Listener {
 
-                var coordArray = Klaxon().parseArray<CoordList>(result.toString())
+                var coords = Klaxon().parse<CoordinateData>(it.toString())
+
+                if (coords != null) {
+                    if (coords.xCoordinateValue.toFloat() != x || coords.yCoordinateValue.toFloat() != y) {
+                        x = coords.xCoordinateValue.toFloat()
+                        y = coords.yCoordinateValue.toFloat()
+
+                        val tempBitmap : Bitmap = Bitmap.createBitmap(bitMap.width, bitMap.height, Bitmap.Config.ARGB_8888)
+                        val tempCanvas = Canvas(tempBitmap)
+
+                        tempCanvas.drawBitmap(bitMap, 0.0F, 0.0F, null)
+                        tempCanvas.drawLine(previousX, previousY, x, y, paint)
+                        image.setImageDrawable(BitmapDrawable(resources, tempBitmap))
+
+                        previousX = x
+                        previousY = y
+
+                    }
+                }
+            },
+
+            Response.ErrorListener { error -> error
+                println(error)
+            }
+        )
+        queue.add(jsonObjectRequest)
+
+    }
+
+    private fun getListOfCordsForGraph() {
+
+        var x : Float = 0.0F
+        var y : Float = 0.0F
+        var previousX : Float = 0.0F
+        var previousY : Float = 0.0F
+
+        var queue = Volley.newRequestQueue(this)
+        var url = "https://us-central1-hulkdoris-4c6eb.cloudfunctions.net/api/positions"
+
+        val tempBitmap : Bitmap = Bitmap.createBitmap(bitMap.width, bitMap.height, Bitmap.Config.ARGB_8888)
+        val tempCanvas = Canvas(tempBitmap)
+
+        tempCanvas.drawBitmap(bitMap, 0.0F, 0.0F, null)
+
+        val jsonObjectRequest = JsonObjectRequest(Request.Method.GET, url, null,
+
+            // On Success
+            Response.Listener {
+
+                var coordArray = Klaxon().parseArray<CoordinateData>(it.toString())
 
                 coordArray?.forEach { i -> i
-                    println(i)
+
+                    tempCanvas.drawLine(previousX, previousY, i.xCoordinateValue.toFloat(), i.yCoordinateValue.toFloat(), paint)
+                    previousX = i.xCoordinateValue.toFloat()
+                    previousY = i.yCoordinateValue.toFloat()
                 }
 
-                series.appendData(DataPoint(x, y), true, 500)
-                graph.addSeries(series)
 
             },
 
@@ -72,22 +133,9 @@ class VisualizeActivity: AppCompatActivity() {
         )
         queue.add(jsonObjectRequest)
 
-        /* x = -0.5
-
-         for (i in 0..50)
-         {
-             x += 0.1
-             y = sinh(x)
-             series.appendData(DataPoint(x,y), true, 500)
-         }
-
-         graph.addSeries(series)
-         */
-        // val series: LineGraphSeries<DataPoint> = LineGraphSeries {DataPoint(0.1, 0.2)}
-
     }
 
-    class CoordList (val ListOfCords : List<JsonObject>) {}
+    data class CoordList (val ListOfCords : List<JSONObject>) {}
 
 
 
