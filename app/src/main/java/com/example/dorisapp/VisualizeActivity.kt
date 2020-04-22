@@ -14,23 +14,24 @@ import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
-import com.beust.klaxon.Converter
-import com.beust.klaxon.JsonArray
-import com.beust.klaxon.JsonObject
-import com.beust.klaxon.Klaxon
+import com.beust.klaxon.*
 import com.jjoe64.graphview.GraphView
 import com.jjoe64.graphview.series.DataPoint
 import com.jjoe64.graphview.series.LineGraphSeries
 import kotlinx.android.synthetic.main.activity_visualize.*
 import org.json.JSONArray
 import org.json.JSONObject
+import java.io.StringReader
+import java.util.logging.Level.parse
 import kotlin.math.sinh
 
 class VisualizeActivity: AppCompatActivity() {
 
-    var image: ImageView = findViewById(R.id.chart)
+   /* var image: ImageView = findViewById(R.id.chart)
     var bitMap : Bitmap = Bitmap.createBitmap(image.width, image.height, Bitmap.Config.ARGB_8888)
     private val paint : Paint = Paint(Color.BLACK)
+
+    */
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,6 +42,7 @@ class VisualizeActivity: AppCompatActivity() {
 
         getListOfCordsForGraph()
 
+        /*
         var handler = Handler()
         handler.postDelayed(Runnable{
             @Override
@@ -49,6 +51,8 @@ class VisualizeActivity: AppCompatActivity() {
                 handler.postDelayed({  }, 1000)
             }
         }, 1000)
+
+         */
     }
 
     private fun getLatestCordsForGraph() {
@@ -64,11 +68,22 @@ class VisualizeActivity: AppCompatActivity() {
         val jsonObjectRequest = JsonObjectRequest(Request.Method.GET, url, null,
 
             // On Success
-            Response.Listener {
+            Response.Listener { response -> response
 
-                var coords = Klaxon().parse<CoordinateData>(it.toString())
+                val parser: Parser = Parser.default()
+                val pos = response.getString("position")
+                println(pos)
+                val stringBuilder: StringBuilder = StringBuilder(pos)
+                val json: JsonObject = parser.parse(stringBuilder) as JsonObject
+                val x = json.string("xCoord")
+                val y = json.string("yCoord")
+                val xInt= x!!.toInt()
+                val yInt = y!!.toInt()
+                val sum = xInt + yInt
+                println(sum)
 
-                if (coords != null) {
+
+               /* if (coords != null) {
                     if (coords.xCoordinateValue.toFloat() != x || coords.yCoordinateValue.toFloat() != y) {
                         x = coords.xCoordinateValue.toFloat()
                         y = coords.yCoordinateValue.toFloat()
@@ -85,6 +100,8 @@ class VisualizeActivity: AppCompatActivity() {
 
                     }
                 }
+
+                */
             },
 
             Response.ErrorListener { error -> error
@@ -105,25 +122,20 @@ class VisualizeActivity: AppCompatActivity() {
         var queue = Volley.newRequestQueue(this)
         var url = "https://us-central1-hulkdoris-4c6eb.cloudfunctions.net/api/positions"
 
-        val tempBitmap : Bitmap = Bitmap.createBitmap(bitMap.width, bitMap.height, Bitmap.Config.ARGB_8888)
-        val tempCanvas = Canvas(tempBitmap)
+        //val tempBitmap : Bitmap = Bitmap.createBitmap(bitMap.width, bitMap.height, Bitmap.Config.ARGB_8888)
+        //val tempCanvas = Canvas(tempBitmap)
 
-        tempCanvas.drawBitmap(bitMap, 0.0F, 0.0F, null)
+        //tempCanvas.drawBitmap(bitMap, 0.0F, 0.0F, null)
 
         val jsonObjectRequest = JsonObjectRequest(Request.Method.GET, url, null,
 
             // On Success
-            Response.Listener {
+            Response.Listener { result -> result
 
-                var coordArray = Klaxon().parseArray<CoordinateData>(it.toString())
+                //val array = Klaxon().parseArray<JSONObject>(it.toString())
+                println(result)
 
-                coordArray?.forEach { i -> i
-
-                    tempCanvas.drawLine(previousX, previousY, i.xCoordinateValue.toFloat(), i.yCoordinateValue.toFloat(), paint)
-                    previousX = i.xCoordinateValue.toFloat()
-                    previousY = i.yCoordinateValue.toFloat()
-                }
-
+                    //tempCanvas.drawLine(previousX, previousY, i.xCoordinateValue.toFloat(), i.yCoordinateValue.toFloat(), paint)
 
             },
 
@@ -135,9 +147,5 @@ class VisualizeActivity: AppCompatActivity() {
 
     }
 
-    data class CoordList (val ListOfCords : List<JSONObject>) {}
-
-
-
-
 }
+
