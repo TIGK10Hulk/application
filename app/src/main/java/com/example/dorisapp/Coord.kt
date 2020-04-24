@@ -1,10 +1,10 @@
 package com.example.dorisapp
 
 class Coord {
-    var xCoord: Int?
-    var yCoord: Int?
-    var isCollision: Boolean?
-    var session: Int?
+    var xCoord: Int
+    var yCoord: Int
+    var isCollision: Boolean
+    var session: Int
 
     constructor(xCoord: Int, yCoord: Int, isCollision: Boolean, session: Int){
         this.xCoord = xCoord
