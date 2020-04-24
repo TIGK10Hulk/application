@@ -8,10 +8,12 @@ import android.graphics.Paint
 import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import com.android.volley.Request
 import com.android.volley.Response
+import com.android.volley.toolbox.JsonArrayRequest
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import com.beust.klaxon.*
@@ -40,19 +42,16 @@ class VisualizeActivity: AppCompatActivity() {
         initializeContentView(R.layout.activity_visualize, findViewById(android.R.id.content), layoutInflater) //Adds activity_main.xml to current view
         initializeDrawerListeners(R.layout.activity_visualize, findViewById(android.R.id.content), this) //Initialize button listeners for navigation system
 
-        getListOfCordsForGraph()
+        val session = getSession()
+        getListOfCordsForGraph(session)
 
-        /*
-        var handler = Handler()
-        handler.postDelayed(Runnable{
-            @Override
-            fun run() {
+        val handler = Handler(Looper.getMainLooper())
+        handler.post( object : Runnable {
+            override fun run() {
                 getLatestCordsForGraph()
-                handler.postDelayed({  }, 1000)
+                handler.postDelayed(this, 1000)
             }
-        }, 1000)
-
-         */
+        })
     }
 
     private fun getLatestCordsForGraph() {
@@ -62,16 +61,16 @@ class VisualizeActivity: AppCompatActivity() {
         var previousX : Float = 0.0F
         var previousY : Float = 0.0F
 
-        var queue = Volley.newRequestQueue(this)
-        var url = "https://us-central1-hulkdoris-4c6eb.cloudfunctions.net/api/positions/latest"
+        val queue = Volley.newRequestQueue(this)
+        val url = "https://us-central1-hulkdoris-4c6eb.cloudfunctions.net/api/positions/latest"
 
         val jsonObjectRequest = JsonObjectRequest(Request.Method.GET, url, null,
 
             // On Success
-            Response.Listener { response -> response
+            Response.Listener {
 
                 val parser: Parser = Parser.default()
-                val pos = response.getString("position")
+                val pos = it.getString("position")
                 println(pos)
                 val stringBuilder: StringBuilder = StringBuilder(pos)
                 val json: JsonObject = parser.parse(stringBuilder) as JsonObject
@@ -81,7 +80,6 @@ class VisualizeActivity: AppCompatActivity() {
                 val yInt = y!!.toInt()
                 val sum = xInt + yInt
                 println(sum)
-
 
                /* if (coords != null) {
                     if (coords.xCoordinateValue.toFloat() != x || coords.yCoordinateValue.toFloat() != y) {
@@ -112,31 +110,57 @@ class VisualizeActivity: AppCompatActivity() {
 
     }
 
-    private fun getListOfCordsForGraph() {
+    private fun getListOfCordsForGraph(session: Int) {
 
         var x : Float = 0.0F
         var y : Float = 0.0F
         var previousX : Float = 0.0F
         var previousY : Float = 0.0F
 
-        var queue = Volley.newRequestQueue(this)
-        var url = "https://us-central1-hulkdoris-4c6eb.cloudfunctions.net/api/positions"
+        println(session)
 
-        //val tempBitmap : Bitmap = Bitmap.createBitmap(bitMap.width, bitMap.height, Bitmap.Config.ARGB_8888)
-        //val tempCanvas = Canvas(tempBitmap)
+        val queue = Volley.newRequestQueue(this)
+        val url = "https://us-central1-hulkdoris-4c6eb.cloudfunctions.net/api/positions/$session"
 
         //tempCanvas.drawBitmap(bitMap, 0.0F, 0.0F, null)
+
+        val jsonArrayRequest = JsonArrayRequest(Request.Method.GET, url, null,
+
+            Response.Listener {
+                val array = Klaxon().parseArray<JSONObject>(it.toString())
+
+                println(array)
+            },
+
+            Response.ErrorListener { error -> error
+                println(error)
+            })
+        queue.add(jsonArrayRequest)
+
+    }
+
+    private fun getSession() : Int {
+
+        val queue = Volley.newRequestQueue(this)
+        val url = "https://us-central1-hulkdoris-4c6eb.cloudfunctions.net/api/positions/latest"
+        var sessionInt = 0
 
         val jsonObjectRequest = JsonObjectRequest(Request.Method.GET, url, null,
 
             // On Success
-            Response.Listener { result -> result
+            Response.Listener {
 
-                //val array = Klaxon().parseArray<JSONObject>(it.toString())
-                println(result)
+                val parser: Parser = Parser.default()
 
-                    //tempCanvas.drawLine(previousX, previousY, i.xCoordinateValue.toFloat(), i.yCoordinateValue.toFloat(), paint)
+                val pos = it.getString("position")
+                val stringBuilder: StringBuilder = StringBuilder(pos)
+                val json: JsonObject = parser.parse(stringBuilder) as JsonObject
+                val session = json.string("session")
+                println(session)
 
+                if (session != null) {
+                    sessionInt = session.toInt()
+                }
             },
 
             Response.ErrorListener { error -> error
@@ -145,6 +169,7 @@ class VisualizeActivity: AppCompatActivity() {
         )
         queue.add(jsonObjectRequest)
 
+        return sessionInt
     }
 
 }
