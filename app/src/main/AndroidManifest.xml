@@ -5,6 +5,8 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
 
     <application
         android:allowBackup="true"
@@ -27,7 +29,7 @@
         <activity android:name=".VisualizeActivity" android:theme="@style/AppTheme.NoActionBar"/>
 
         <service
-            android:name=".BluetoothHandler"
+            android:name=".BluetoothLeService"
             android:enabled="true"
             android:exported="true"
             />
