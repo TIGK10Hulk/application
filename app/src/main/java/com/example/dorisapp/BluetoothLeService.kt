@@ -20,8 +20,8 @@ class BLEConstants {
         const val MAC_ADDRESS = "00:1B:10:65:FC:75"
         var SERVICE_UUID_ROBOT: UUID = UUID.fromString("0000ffe1-0000-1000-8000-00805f9b34fb")
         var SERVICE_UUID_ROBOT_ALTERNATIVE: UUID = UUID.fromString("9e5d1e47-5c13-43a0-8635-82ad38a1386f")
-        var SERVICE_UUID_ROBOT_WRITE: UUID = UUID.fromString("0000ffe3-0000-1000-8000-00805f9b34fb")
-        var SERVICE_UUID_ROBOT_READ: UUID = UUID.fromString("0000ffe2-0000-1000-8000-00805f9b34fb")
+        var CHAR_UUID_ROBOT_WRITE: UUID = UUID.fromString("0000ffe3-0000-1000-8000-00805f9b34fb")
+        var CHAR_UUID_ROBOT_READ: UUID = UUID.fromString("0000ffe2-0000-1000-8000-00805f9b34fb")
 
 
 
@@ -146,7 +146,6 @@ class BluetoothLeService : Service() {
                 m_bluetoothGatt?.discoverServices()
 
                 //TODO temporarily
-                //Log.i(m_TAG ,findCharacteristicsFromDevice(BLEConstants.MAC_ADDRESS, m_REGISTERAPP_UUID).toString())
 
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 //TODO say we are disconnected
@@ -159,7 +158,7 @@ class BluetoothLeService : Service() {
                 m_bluetoothGattService = m_bluetoothGatt!!.getService(BLEConstants.SERVICE_UUID_ROBOT)
                 Log.i(m_TAG, m_bluetoothGattService.toString())
 
-                //findCharacteristicsFromDevice(BLEConstants.MAC_ADDRESS, BLEConstants.SERVICE_UUID_ROBOT_WRITE)
+                findCharacteristicsFromDevice(BLEConstants.MAC_ADDRESS, BLEConstants.CHAR_UUID_ROBOT_WRITE)
                 Log.i(m_TAG, "Bra jobbat :)")
             } else {
                 Log.w(m_TAG, "onServicesdeicovered: " + status)
@@ -232,7 +231,7 @@ class BluetoothLeService : Service() {
 
         for(service in m_bluetoothGatt!!.services) {
             Log.i(m_TAG, "I AIM IN FOR LOOP")
-            val characteristic : BluetoothGattCharacteristic = service.getCharacteristic(characteristicUUID)
+            val characteristic : BluetoothGattCharacteristic? = service!!.getCharacteristic(characteristicUUID)
             if(characteristic != null) {
                 Log.i(m_TAG, "CHAR" + characteristic.toString())
                 return characteristic
