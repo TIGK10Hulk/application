@@ -27,6 +27,8 @@ class VisualizeActivity: AppCompatActivity() {
     var previousX = 0F
     var previousY = 0.00F
     var firstTime = true
+    val paint : Paint = Paint(Color.BLACK)
+    val paintCollision : Paint = Paint(Color.RED)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,10 +37,11 @@ class VisualizeActivity: AppCompatActivity() {
         initializeContentView(R.layout.activity_visualize, findViewById(android.R.id.content), layoutInflater) //Adds activity_main.xml to current view
         initializeDrawerListeners(R.layout.activity_visualize, findViewById(android.R.id.content), this) //Initialize button listeners for navigation system
 
+            firstTime = true
             val image = setImageView()
             val bitMap = setBitMap(image)
 
-            getSession()
+            getSession(image, bitMap)
 
           /*  val handler = Handler(Looper.getMainLooper())
             handler.post(object : Runnable {
@@ -68,7 +71,6 @@ class VisualizeActivity: AppCompatActivity() {
         val statusText : TextView = findViewById(R.id.visualizeStatusText)
         var x = 0
         var y = 0
-        val paint : Paint = Paint(Color.BLACK)
         val queue = Volley.newRequestQueue(this)
         val url = "https://us-central1-hulkdoris-4c6eb.cloudfunctions.net/api/positions/latest"
 
@@ -84,7 +86,7 @@ class VisualizeActivity: AppCompatActivity() {
                     val json: JsonObject = parser.parse(stringBuilder) as JsonObject
                     val x = json.string("xCoord")
                     val y = json.string("yCoord")
-
+                    val collision = json.string("isCollision")
 
                     if (x != null && y != null ) {
                         val xFloat= x.toFloat()
@@ -97,15 +99,11 @@ class VisualizeActivity: AppCompatActivity() {
                                 firstTime = false
                             }
 
-                            //val tempBitmap : Bitmap = Bitmap.createBitmap(bitMap.width, bitMap.height, Bitmap.Config.ARGB_8888)
-                            val tempCanvas = Canvas(bitMap)
-                            tempCanvas.drawBitmap(bitMap, 0F, 0F, null)
-
-                            tempCanvas.drawLine(previousX, previousY, xFloat, yFloat, paint)
-                            image.setImageDrawable(BitmapDrawable(resources, bitMap))
+                            paint(xFloat, yFloat, collision!!.toBoolean(), bitMap, image)
 
                             previousX = xFloat
                             previousY = yFloat
+                            //val tempBitmap : Bitmap = Bitmap.createBitmap(bitMap.width, bitMap.height, Bitmap.Config.ARGB_8888)
                         }
                     }
 
@@ -113,18 +111,18 @@ class VisualizeActivity: AppCompatActivity() {
 
                 Response.ErrorListener { error -> error
                     println(error)
-                    statusText.text = "Couldn't get coordinates, try again"
+                    statusText.text = resources.getString(R.string.visualize_coord_error)
 
                 }
             )
             queue.add(jsonObjectRequest)
         } catch (error : JSONException) {
-
+            statusText.text = resources.getString(R.string.visualize_coord_error)
         }
 
     }
 
-    private fun getListOfCordsForGraph(session: String?) {
+    private fun getListOfCordsForGraph(session: String?, image : ImageView, bitMap : Bitmap) {
 
         var x : Float = 0.0F
         var y : Float = 0.0F
@@ -146,6 +144,8 @@ class VisualizeActivity: AppCompatActivity() {
                     val stringBuilder : java.lang.StringBuilder = java.lang.StringBuilder(pos)
                     val json : JsonObject = parser.parse(stringBuilder) as JsonObject
                     println(json)
+
+
                 },
 
                 Response.ErrorListener { error -> error
@@ -157,11 +157,9 @@ class VisualizeActivity: AppCompatActivity() {
 
         }
 
-
-
     }
 
-    private fun getSession() {
+    private fun getSession(image : ImageView, bitMap : Bitmap) {
 
         val statusText : TextView = findViewById(R.id.visualizeStatusText)
         val queue = Volley.newRequestQueue(this)
@@ -181,27 +179,39 @@ class VisualizeActivity: AppCompatActivity() {
                     val session = json.string("session")
 
                     if (session != null) {
-                        statusText.text = "Plotting route for mower.."
-                        getListOfCordsForGraph(session)
+                        statusText.text = resources.getString(R.string.visualize_coord_success)
+                        getListOfCordsForGraph(session, image, bitMap)
 
                     } else {
-                        statusText.text = "Couldn't get coordinates, try again"
+                        statusText.text = resources.getString(R.string.visualize_coord_error)
                     }
                 },
 
                 Response.ErrorListener { error -> error
                     println(error)
-                    statusText.text = "Couldn't get coordinates, try again"
+                    statusText.text = resources.getString(R.string.visualize_coord_error)
 
                 }
             )
             queue.add(jsonObjectRequest)
         } catch (error : JSONException) {
-            statusText.text = "Couldn't get coordinates, try again"
+            statusText.text = resources.getString(R.string.visualize_coord_error)
             println(error)
         }
 
 
+    }
+
+    private fun paint(x : Float, y : Float, collision : Boolean, bitMap : Bitmap, image : ImageView) {
+
+        val tempCanvas = Canvas(bitMap)
+        tempCanvas.drawBitmap(bitMap, 0F, 0F, null)
+
+        if (collision) {
+            tempCanvas.drawPoint(x, y, paintCollision)
+        }
+        tempCanvas.drawLine(previousX, previousY, x, y, paint)
+        image.setImageDrawable(BitmapDrawable(resources, bitMap))
     }
 
 }
