@@ -1,12 +1,7 @@
 package com.example.dorisapp
 
 import android.app.Service
-import android.bluetooth.BluetoothManager;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothGatt;
-import android.bluetooth.BluetoothGattCallback;
-import android.bluetooth.BluetoothGattCharacteristic;
-import android.bluetooth.BluetoothProfile;
+import android.bluetooth.*
 import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
@@ -15,6 +10,7 @@ import android.os.Handler
 import android.os.IBinder
 import android.util.Log
 import org.jetbrains.anko.toast
+import java.util.*
 import kotlin.experimental.and
 
 class BLEConstants {
@@ -22,6 +18,12 @@ class BLEConstants {
         const val ACTION_DATA_WRITTEN = "com.example.dorisapp.ACTION_DATA_WRITTEN"
         const val EXTRA_DATA = "com.example.dorisapp.EXTRA_DATA"
         const val MAC_ADDRESS = "00:1B:10:65:FC:75"
+        var SERVICE_UUID_ROBOT: UUID = UUID.fromString("0000ffe1-0000-1000-8000-00805f9b34fb")
+        var SERVICE_UUID_ROBOT_ALTERNATIVE: UUID = UUID.fromString("9e5d1e47-5c13-43a0-8635-82ad38a1386f")
+        var SERVICE_UUID_ROBOT_WRITE: UUID = UUID.fromString("0000ffe3-0000-1000-8000-00805f9b34fb")
+        var SERVICE_UUID_ROBOT_READ: UUID = UUID.fromString("0000ffe2-0000-1000-8000-00805f9b34fb")
+
+
 
     }
 }
@@ -43,7 +45,10 @@ class BluetoothLeService : Service() {
     //Used to conduct GATT client operations
     var m_bluetoothGatt: BluetoothGatt? = null
 
+    var m_bluetoothGattService: BluetoothGattService? = null
+
     var m_BLUETOOTH_CONNECTED = false
+    var m_REGISTERAPP_UUID: UUID = UUID.fromString("f564e90a-382c-4872-9d9e-256a81261116")
 
     override fun onBind(intent: Intent): IBinder {
         return mBinder
@@ -111,10 +116,18 @@ class BluetoothLeService : Service() {
             return false
         }
 
+        Log.i(m_TAG,"Device object: " + device.toString())
+
         m_deviceAddress = deviceAddress;
         m_bluetoothGatt = device.connectGatt(this, false, gattCallback)
 
-        Log.i(m_TAG, BluetoothGatt.GATT_SUCCESS.toString());
+        Log.i(m_TAG,"GATT_SUCCES code : " +BluetoothGatt.GATT_SUCCESS.toString());
+
+
+        if(m_bluetoothGatt != null) {
+            Log.i(m_TAG,"Services in connect: " + m_bluetoothGatt!!.services)
+        }
+
 
         m_BLUETOOTH_CONNECTED = true;
         Log.i(m_TAG, "We are connnected to Gatt server on Doris")
@@ -130,10 +143,26 @@ class BluetoothLeService : Service() {
         ) {
             if(newState == BluetoothProfile.STATE_CONNECTED) {
                 //TODO say we are connected
-                gatt.discoverServices()
                 m_bluetoothGatt?.discoverServices()
+
+                //TODO temporarily
+                //Log.i(m_TAG ,findCharacteristicsFromDevice(BLEConstants.MAC_ADDRESS, m_REGISTERAPP_UUID).toString())
+
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 //TODO say we are disconnected
+            }
+        }
+
+        override fun onServicesDiscovered(gatt: BluetoothGatt?, status: Int) {
+            if(status == BluetoothGatt.GATT_SUCCESS) {
+                Log.i(m_TAG,"SERVICES HÄR : "+ m_bluetoothGatt?.services.toString())
+                m_bluetoothGattService = m_bluetoothGatt!!.getService(BLEConstants.SERVICE_UUID_ROBOT)
+                Log.i(m_TAG, m_bluetoothGattService.toString())
+
+                //findCharacteristicsFromDevice(BLEConstants.MAC_ADDRESS, BLEConstants.SERVICE_UUID_ROBOT_WRITE)
+                Log.i(m_TAG, "Bra jobbat :)")
+            } else {
+                Log.w(m_TAG, "onServicesdeicovered: " + status)
             }
         }
 
@@ -148,9 +177,7 @@ class BluetoothLeService : Service() {
                 BluetoothGatt.GATT_SUCCESS -> {
                     Log.i(m_TAG, "Successfully read from characteristics: $characteristic")
                 }
-
             }
-
         }
 
         override fun onCharacteristicWrite(
@@ -189,6 +216,29 @@ class BluetoothLeService : Service() {
         }
 
         //TODO(write to char here?)
+
+    }
+
+    fun findCharacteristicsFromDevice(Mac_address: String, characteristicUUID: UUID) : BluetoothGattCharacteristic? {
+        Log.i(m_TAG, "I AM IN FIND CHAR")
+
+
+        if(m_bluetoothGatt == null) {
+            Log.e(m_TAG, "BLuetoothgatt is null")
+            return null;
+        }
+
+        Log.i(m_TAG, m_bluetoothGatt!!.services.toString())
+
+        for(service in m_bluetoothGatt!!.services) {
+            Log.i(m_TAG, "I AIM IN FOR LOOP")
+            val characteristic : BluetoothGattCharacteristic = service.getCharacteristic(characteristicUUID)
+            if(characteristic != null) {
+                Log.i(m_TAG, "CHAR" + characteristic.toString())
+                return characteristic
+            }
+        }
+        return null;
 
     }
 
