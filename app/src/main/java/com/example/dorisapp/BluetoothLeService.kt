@@ -162,7 +162,6 @@ class BluetoothLeService : Service() {
 
                 val char = findCharacteristicsFromDevice(BLEConstants.MAC_ADDRESS, BLEConstants.CHAR_UUID_ROBOT_WRITE)
                 if(char != null) {
-                    writeCharacteristics(char, 1)
                     Log.i(m_TAG, "Bra jobbat :)")
                 }
             } else {
@@ -203,6 +202,14 @@ class BluetoothLeService : Service() {
     fun broadcastUpdate(action: String) {
         val intent = Intent(action)
         sendBroadcast(intent)
+    }
+
+    fun getCharThenWrite(command: Int) {
+        if(m_bluetoothGattCharacteristic == null) {
+            Log.e(m_TAG, "ERROR in getCharThenWrite")
+            return
+        }
+        writeCharacteristics(m_bluetoothGattCharacteristic!!, command)
     }
 
     fun broadcastUpdate(action: String, characteristic: BluetoothGattCharacteristic?) {
@@ -247,6 +254,7 @@ class BluetoothLeService : Service() {
             val characteristic : BluetoothGattCharacteristic? = service!!.getCharacteristic(characteristicUUID)
             if(characteristic != null) {
                 Log.i(m_TAG, "CHAR" + characteristic.toString())
+                m_bluetoothGattCharacteristic = characteristic
                 return characteristic
             }
         }

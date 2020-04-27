@@ -4,6 +4,7 @@ import android.content.*
 import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 
 class RemoteActivity: AppCompatActivity() {
@@ -25,6 +26,30 @@ class RemoteActivity: AppCompatActivity() {
         bindService(intent, myConnection, Context.BIND_AUTO_CREATE )
 
     }
+
+    fun drive(view: View){
+        bluetoothService!!.getCharThenWrite(1)
+    }
+
+    fun reverse(view: View) {
+        bluetoothService!!.getCharThenWrite(5)
+    }
+
+    fun stop(view: View) {
+        bluetoothService!!.getCharThenWrite(0)
+    }
+
+    fun turnLeft(view: View){
+        bluetoothService!!.getCharThenWrite(2)
+    }
+
+    fun turnRight(view: View) {
+        bluetoothService!!.getCharThenWrite(3)
+    }
+
+
+
+
 
 
 
