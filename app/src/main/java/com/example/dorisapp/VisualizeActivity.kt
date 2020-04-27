@@ -11,6 +11,7 @@ import android.os.Handler
 import android.os.Looper
 import android.view.View
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.android.volley.Request
 import com.android.volley.Response
@@ -18,12 +19,14 @@ import com.android.volley.toolbox.JsonArrayRequest
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import com.beust.klaxon.*
+import org.json.JSONException
 import org.json.JSONObject
 
 class VisualizeActivity: AppCompatActivity() {
 
-    var previousX = 0.00F
+    var previousX = 0F
     var previousY = 0.00F
+    var firstTime = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,16 +38,17 @@ class VisualizeActivity: AppCompatActivity() {
             val image = setImageView()
             val bitMap = setBitMap(image)
 
-            //val session = getSession()
-            //getListOfCordsForGraph(session)
+            getSession()
 
-            val handler = Handler(Looper.getMainLooper())
+          /*  val handler = Handler(Looper.getMainLooper())
             handler.post(object : Runnable {
                 override fun run() {
                     getLatestCordsForGraph(image, bitMap)
                     handler.postDelayed(this, 3000)
                 }
             })
+
+           */
     }
 
     private fun setImageView() : ImageView {
@@ -56,84 +60,71 @@ class VisualizeActivity: AppCompatActivity() {
 
     private fun setBitMap(image : ImageView) : Bitmap {
 
-        return Bitmap.createBitmap(image.width, image.height, Bitmap.Config.ARGB_8888)
+        return Bitmap.createBitmap(1000, 1000, Bitmap.Config.ARGB_8888)
     }
 
     private fun getLatestCordsForGraph(image: ImageView, bitMap: Bitmap) {
 
+        val statusText : TextView = findViewById(R.id.visualizeStatusText)
         var x = 0
         var y = 0
-
-
         val paint : Paint = Paint(Color.BLACK)
-
-
         val queue = Volley.newRequestQueue(this)
         val url = "https://us-central1-hulkdoris-4c6eb.cloudfunctions.net/api/positions/latest"
 
-        val jsonObjectRequest = JsonObjectRequest(Request.Method.GET, url, null,
+        try {
+            val jsonObjectRequest = JsonObjectRequest(Request.Method.GET, url, null,
 
-            // On Success
-            Response.Listener {
+                // On Success
+                Response.Listener {
 
-                val parser: Parser = Parser.default()
-                val pos = it.getString("position")
-                val stringBuilder: StringBuilder = StringBuilder(pos)
-                val json: JsonObject = parser.parse(stringBuilder) as JsonObject
-                val x = json.string("xCoord")
-                val y = json.string("yCoord")
+                    val parser: Parser = Parser.default()
+                    val pos = it.getString("position")
+                    val stringBuilder: StringBuilder = StringBuilder(pos)
+                    val json: JsonObject = parser.parse(stringBuilder) as JsonObject
+                    val x = json.string("xCoord")
+                    val y = json.string("yCoord")
 
 
-                if (x != null && y != null ) {
-                    val xFloat= x.toFloat()
-                    val yFloat = y.toFloat()
-                    if (previousX != xFloat || previousY != yFloat) {
+                    if (x != null && y != null ) {
+                        val xFloat= x.toFloat()
+                        val yFloat = y.toFloat()
+                        if (previousX != xFloat || previousY != yFloat) {
 
-                        //val tempBitmap : Bitmap = Bitmap.createBitmap(bitMap.width, bitMap.height, Bitmap.Config.ARGB_8888)
-                        val tempCanvas = Canvas(bitMap)
-                        tempCanvas.drawBitmap(bitMap, 10.0F, 10.0F, null)
+                            if (firstTime) {
+                                previousX = bitMap.width / 2F
+                                previousY = bitMap.height / 2F
+                                firstTime = false
+                            }
 
-                        val randomX = (0..1000).random()
-                        val randomY = (0..1000).random()
+                            //val tempBitmap : Bitmap = Bitmap.createBitmap(bitMap.width, bitMap.height, Bitmap.Config.ARGB_8888)
+                            val tempCanvas = Canvas(bitMap)
+                            tempCanvas.drawBitmap(bitMap, 0F, 0F, null)
 
-                        tempCanvas.drawLine(previousX, previousY, randomX.toFloat(), randomY.toFloat(), paint)
-                        image.setImageDrawable(BitmapDrawable(resources, bitMap))
+                            tempCanvas.drawLine(previousX, previousY, xFloat, yFloat, paint)
+                            image.setImageDrawable(BitmapDrawable(resources, bitMap))
 
-                        previousX = randomX.toFloat()
-                        previousY = randomY.toFloat()
+                            previousX = xFloat
+                            previousY = yFloat
+                        }
                     }
+
+                },
+
+                Response.ErrorListener { error -> error
+                    println(error)
+                    statusText.text = "Couldn't get coordinates, try again"
+
                 }
+            )
+            queue.add(jsonObjectRequest)
+        } catch (error : JSONException) {
 
-               /* if (coords != null) {
-                    if (coords.xCoordinateValue.toFloat() != x || coords.yCoordinateValue.toFloat() != y) {
-                        x = coords.xCoordinateValue.toFloat()
-                        y = coords.yCoordinateValue.toFloat()
-
-                        val tempBitmap : Bitmap = Bitmap.createBitmap(bitMap.width, bitMap.height, Bitmap.Config.ARGB_8888)
-                        val tempCanvas = Canvas(tempBitmap)
-
-                        tempCanvas.drawBitmap(bitMap, 0.0F, 0.0F, null)
-                        tempCanvas.drawLine(previousX, previousY, x, y, paint)
-                        image.setImageDrawable(BitmapDrawable(resources, tempBitmap))
-
-                        previousX = x
-                        previousY = y
-
-                    }
-                }
-
-                */
-            },
-
-            Response.ErrorListener { error -> error
-                println(error)
-            }
-        )
-        queue.add(jsonObjectRequest)
+        }
 
     }
 
-    private fun getListOfCordsForGraph(session: Int) {
+    private fun getListOfCordsForGraph(session: String?) {
 
         var x : Float = 0.0F
         var y : Float = 0.0F
@@ -143,56 +134,74 @@ class VisualizeActivity: AppCompatActivity() {
         println(session)
 
         val queue = Volley.newRequestQueue(this)
-        val url = "https://us-central1-hulkdoris-4c6eb.cloudfunctions.net/api/positions/$session"
+        val url = "https://us-central1-hulkdoris-4c6eb.cloudfunctions.net/api/positions/session/$session"
 
         //tempCanvas.drawBitmap(bitMap, 0.0F, 0.0F, null)
+        try {
+            val jsonArrayRequest = JsonObjectRequest(Request.Method.GET, url, null,
 
-        val jsonArrayRequest = JsonArrayRequest(Request.Method.GET, url, null,
+                Response.Listener {
+                    val parser : Parser = Parser.default()
+                    val pos = it.getString("positions")
+                    val stringBuilder : java.lang.StringBuilder = java.lang.StringBuilder(pos)
+                    val json : JsonObject = parser.parse(stringBuilder) as JsonObject
+                    println(json)
+                },
 
-            Response.Listener {
-                val array = Klaxon().parseArray<JSONObject>(it.toString())
+                Response.ErrorListener { error -> error
+                    println(error)
 
-                println(array)
-            },
+                })
+            queue.add(jsonArrayRequest)
+        } catch (error : JSONException) {
 
-            Response.ErrorListener { error -> error
-                println(error)
-            })
-        queue.add(jsonArrayRequest)
+        }
+
+
 
     }
 
-    private fun getSession() : Int {
+    private fun getSession() {
 
+        val statusText : TextView = findViewById(R.id.visualizeStatusText)
         val queue = Volley.newRequestQueue(this)
         val url = "https://us-central1-hulkdoris-4c6eb.cloudfunctions.net/api/positions/latest"
-        var sessionInt = 0
 
-        val jsonObjectRequest = JsonObjectRequest(Request.Method.GET, url, null,
+        try {
+            val jsonObjectRequest = JsonObjectRequest(Request.Method.GET, url, null,
 
-            // On Success
-            Response.Listener {
+                // On Success
+                Response.Listener {
 
-                val parser: Parser = Parser.default()
+                    val parser: Parser = Parser.default()
 
-                val pos = it.getString("position")
-                val stringBuilder: StringBuilder = StringBuilder(pos)
-                val json: JsonObject = parser.parse(stringBuilder) as JsonObject
-                val session = json.string("session")
-                println(session)
+                    val pos = it.getString("position")
+                    val stringBuilder: StringBuilder = StringBuilder(pos)
+                    val json: JsonObject = parser.parse(stringBuilder) as JsonObject
+                    val session = json.string("session")
 
-                if (session != null) {
-                    sessionInt = session.toInt()
+                    if (session != null) {
+                        statusText.text = "Plotting route for mower.."
+                        getListOfCordsForGraph(session)
+
+                    } else {
+                        statusText.text = "Couldn't get coordinates, try again"
+                    }
+                },
+
+                Response.ErrorListener { error -> error
+                    println(error)
+                    statusText.text = "Couldn't get coordinates, try again"
+
                 }
-            },
+            )
+            queue.add(jsonObjectRequest)
+        } catch (error : JSONException) {
+            statusText.text = "Couldn't get coordinates, try again"
+            println(error)
+        }
 
-            Response.ErrorListener { error -> error
-                println(error)
-            }
-        )
-        queue.add(jsonObjectRequest)
 
-        return sessionInt
     }
 
 }

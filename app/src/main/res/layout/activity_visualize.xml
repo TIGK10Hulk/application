@@ -6,9 +6,19 @@
     <ImageView
         android:id="@+id/chart"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="400dp"
         android:layout_centerVertical="true"
         android:src="@drawable/chart">
     </ImageView>
+
+    <TextView
+        android:id="@+id/visualizeStatusText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/chart"
+        android:layout_marginTop="40dp"
+        android:textSize="25sp"
+        android:text="@string/status_text_visualize"/>
 
 </RelativeLayout>
