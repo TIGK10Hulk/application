@@ -28,6 +28,8 @@ class RemoteActivity: AppCompatActivity() {
 
 
 
+
+
     private val gattUpdateReciever = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             val action = intent!!.action

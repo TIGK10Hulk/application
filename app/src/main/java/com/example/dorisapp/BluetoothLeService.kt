@@ -47,6 +47,8 @@ class BluetoothLeService : Service() {
 
     var m_bluetoothGattService: BluetoothGattService? = null
 
+    var m_bluetoothGattCharacteristic: BluetoothGattCharacteristic? = null
+
     var m_BLUETOOTH_CONNECTED = false
     var m_REGISTERAPP_UUID: UUID = UUID.fromString("f564e90a-382c-4872-9d9e-256a81261116")
 
@@ -158,8 +160,11 @@ class BluetoothLeService : Service() {
                 m_bluetoothGattService = m_bluetoothGatt!!.getService(BLEConstants.SERVICE_UUID_ROBOT)
                 Log.i(m_TAG, m_bluetoothGattService.toString())
 
-                findCharacteristicsFromDevice(BLEConstants.MAC_ADDRESS, BLEConstants.CHAR_UUID_ROBOT_WRITE)
-                Log.i(m_TAG, "Bra jobbat :)")
+                val char = findCharacteristicsFromDevice(BLEConstants.MAC_ADDRESS, BLEConstants.CHAR_UUID_ROBOT_WRITE)
+                if(char != null) {
+                    writeCharacteristics(char, 1)
+                    Log.i(m_TAG, "Bra jobbat :)")
+                }
             } else {
                 Log.w(m_TAG, "onServicesdeicovered: " + status)
             }
@@ -187,6 +192,8 @@ class BluetoothLeService : Service() {
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 //TODO say we have written data
                 Log.i(TAG, "Data written $characteristic")
+                Thread.sleep(1000)
+                //writeCharacteristics(characteristic)
                 //TODO broadcast intent that says we have written data
                 broadcastUpdate(BLEConstants.ACTION_DATA_WRITTEN, characteristic)
             }
@@ -208,11 +215,18 @@ class BluetoothLeService : Service() {
 
     }
 
-    fun writeCharacteristics(characteristic: BluetoothGattCharacteristic) {
+    fun writeCharacteristics(characteristic: BluetoothGattCharacteristic, command: Int) {
         //check we access to BT radio
         if(m_bluetoothAdapter == null || m_bluetoothGatt == null) {
             return
         }
+        var byteArray:ByteArray? = null
+        byteArray = byteArrayOf(command.toByte())
+        characteristic.value = byteArray
+
+        Log.i(m_TAG, "I AM IN WRITECHARACTERISTICS: " + "bytaarray: " + byteArray.toString() +"Properties: "+ characteristic.properties.toInt() +" charValue: " + characteristic.value)
+
+        m_bluetoothGatt!!.writeCharacteristic(characteristic)
 
         //TODO(write to char here?)
 
@@ -220,7 +234,6 @@ class BluetoothLeService : Service() {
 
     fun findCharacteristicsFromDevice(Mac_address: String, characteristicUUID: UUID) : BluetoothGattCharacteristic? {
         Log.i(m_TAG, "I AM IN FIND CHAR")
-
 
         if(m_bluetoothGatt == null) {
             Log.e(m_TAG, "BLuetoothgatt is null")
