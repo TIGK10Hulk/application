@@ -21,7 +21,7 @@ class BLEConstants {
     companion object {
         const val ACTION_DATA_WRITTEN = "com.example.dorisapp.ACTION_DATA_WRITTEN"
         const val EXTRA_DATA = "com.example.dorisapp.EXTRA_DATA"
-
+        const val MAC_ADDRESS = "00:1B:10:65:FC:75"
 
     }
 }
@@ -43,10 +43,7 @@ class BluetoothLeService : Service() {
     //Used to conduct GATT client operations
     var m_bluetoothGatt: BluetoothGatt? = null
 
-    var BLUETOOTH_CONNECTED = 0
-
-
-
+    var m_BLUETOOTH_CONNECTED = false
 
     override fun onBind(intent: Intent): IBinder {
         return mBinder
@@ -64,13 +61,21 @@ class BluetoothLeService : Service() {
         // Do a periodic task
         mHandler = Handler()
         mRunnable = Runnable {
-            init()
+            if(isBluetoothLEConnected()) {
+                //TODO hantera läs skriv
+            } else {
+                init()
+            }
         }
         mHandler.postDelayed(mRunnable, 2000)
         //Line 38 needs to be recalled as soon as the previous call has been finished
         //This is going to be the function that will loop and check for new data in the bluetooth stream
 
         return START_STICKY
+    }
+
+    private fun isBluetoothLEConnected () : Boolean {
+        return m_BLUETOOTH_CONNECTED;
     }
 
     // Initialize BluetoothAdapter from BLuetoothManager
@@ -88,12 +93,15 @@ class BluetoothLeService : Service() {
             Log.e(m_TAG, "Unable to get initialize BluetoothAdapter")
             return false
         }
+        connect(BLEConstants.MAC_ADDRESS)
         return true
     }
 
     private fun isEnabled(): Boolean {
         return this.m_bluetoothAdapter!!.isEnabled
     }
+
+    //scan here egentligen
 
     private fun connect(deviceAddress: String?) : Boolean {
         val device = m_bluetoothAdapter!!.getRemoteDevice(deviceAddress)
@@ -105,6 +113,8 @@ class BluetoothLeService : Service() {
 
         m_deviceAddress = deviceAddress;
         m_bluetoothGatt = device.connectGatt(this, false, gattCallback)
+        m_BLUETOOTH_CONNECTED = true;
+        Log.i(m_TAG, "We are connnected to Gatt server on Doris")
         return true
     }
 
@@ -149,7 +159,7 @@ class BluetoothLeService : Service() {
                 //TODO say we have written data
                 Log.i(TAG, "Data written $characteristic")
                 //TODO broadcast intent that says we have written data
-                broadcastUpdate("1", characteristic)
+                broadcastUpdate(BLEConstants.ACTION_DATA_WRITTEN, characteristic)
             }
         }
     }

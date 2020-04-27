@@ -26,13 +26,15 @@ class RemoteActivity: AppCompatActivity() {
 
     }
 
+
+
     private val gattUpdateReciever = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             val action = intent!!.action
 
             when(action) {
                 BLEConstants.ACTION_DATA_WRITTEN -> {
-                    val data = intent.getStringExtra(BLEConstants.EXTRA_DATA)
+                    val data = intent.getByteArrayExtra(BLEConstants.EXTRA_DATA)
                     Log.i(m_TAG, "DATA WRITTEN $data")
                 }
             }
