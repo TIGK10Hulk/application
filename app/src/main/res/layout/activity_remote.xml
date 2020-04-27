@@ -14,7 +14,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_arrow_upward" />
+        app:srcCompat="@drawable/ic_arrow_upward"
+        android:onClick="driveForward"/>
 
     <ImageButton
         android:id="@+id/reverseButton"
@@ -25,7 +26,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/forwardButton"
-        app:srcCompat="@drawable/ic_arrow_downward" />
+        app:srcCompat="@drawable/ic_arrow_downward"
+        android:onClick="driveBackwards"/>
 
     <ImageButton
         android:id="@+id/turnLeftButton"
@@ -36,7 +38,8 @@
         app:layout_constraintEnd_toStartOf="@+id/turnRightButton"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_arrow_left" />
+        app:srcCompat="@drawable/ic_arrow_left"
+        android:onClick="driveLeft"/>
 
     <ImageButton
         android:id="@+id/turnRightButton"
@@ -47,5 +50,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/turnLeftButton"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_arrow_right" />
+        app:srcCompat="@drawable/ic_arrow_right"
+        android:onClick="driveRight"/>
 </androidx.constraintlayout.widget.ConstraintLayout>
