@@ -1,14 +1,15 @@
 package com.example.dorisapp
 
-import android.app.DownloadManager
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.drawable.BitmapDrawable
+import android.media.Image
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.view.View
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import com.android.volley.Request
@@ -17,23 +18,12 @@ import com.android.volley.toolbox.JsonArrayRequest
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import com.beust.klaxon.*
-import com.jjoe64.graphview.GraphView
-import com.jjoe64.graphview.series.DataPoint
-import com.jjoe64.graphview.series.LineGraphSeries
-import kotlinx.android.synthetic.main.activity_visualize.*
-import org.json.JSONArray
 import org.json.JSONObject
-import java.io.StringReader
-import java.util.logging.Level.parse
-import kotlin.math.sinh
 
 class VisualizeActivity: AppCompatActivity() {
 
-   /* var image: ImageView = findViewById(R.id.chart)
-    var bitMap : Bitmap = Bitmap.createBitmap(image.width, image.height, Bitmap.Config.ARGB_8888)
-    private val paint : Paint = Paint(Color.BLACK)
-
-    */
+    var previousX = 0.00F
+    var previousY = 0.00F
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,24 +32,41 @@ class VisualizeActivity: AppCompatActivity() {
         initializeContentView(R.layout.activity_visualize, findViewById(android.R.id.content), layoutInflater) //Adds activity_main.xml to current view
         initializeDrawerListeners(R.layout.activity_visualize, findViewById(android.R.id.content), this) //Initialize button listeners for navigation system
 
-        val session = getSession()
-        getListOfCordsForGraph(session)
+            val image = setImageView()
+            val bitMap = setBitMap(image)
 
-        val handler = Handler(Looper.getMainLooper())
-        handler.post( object : Runnable {
-            override fun run() {
-                getLatestCordsForGraph()
-                handler.postDelayed(this, 1000)
-            }
-        })
+            //val session = getSession()
+            //getListOfCordsForGraph(session)
+
+            val handler = Handler(Looper.getMainLooper())
+            handler.post(object : Runnable {
+                override fun run() {
+                    getLatestCordsForGraph(image, bitMap)
+                    handler.postDelayed(this, 3000)
+                }
+            })
     }
 
-    private fun getLatestCordsForGraph() {
+    private fun setImageView() : ImageView {
 
-        var x : Float = 0.0F
-        var y : Float = 0.0F
-        var previousX : Float = 0.0F
-        var previousY : Float = 0.0F
+        val image: ImageView = findViewById(R.id.chart)
+        return image
+
+    }
+
+    private fun setBitMap(image : ImageView) : Bitmap {
+
+        return Bitmap.createBitmap(image.width, image.height, Bitmap.Config.ARGB_8888)
+    }
+
+    private fun getLatestCordsForGraph(image: ImageView, bitMap: Bitmap) {
+
+        var x = 0
+        var y = 0
+
+
+        val paint : Paint = Paint(Color.BLACK)
+
 
         val queue = Volley.newRequestQueue(this)
         val url = "https://us-central1-hulkdoris-4c6eb.cloudfunctions.net/api/positions/latest"
@@ -71,15 +78,31 @@ class VisualizeActivity: AppCompatActivity() {
 
                 val parser: Parser = Parser.default()
                 val pos = it.getString("position")
-                println(pos)
                 val stringBuilder: StringBuilder = StringBuilder(pos)
                 val json: JsonObject = parser.parse(stringBuilder) as JsonObject
                 val x = json.string("xCoord")
                 val y = json.string("yCoord")
-                val xInt= x!!.toInt()
-                val yInt = y!!.toInt()
-                val sum = xInt + yInt
-                println(sum)
+
+
+                if (x != null && y != null ) {
+                    val xFloat= x.toFloat()
+                    val yFloat = y.toFloat()
+                    if (previousX != xFloat || previousY != yFloat) {
+
+                        //val tempBitmap : Bitmap = Bitmap.createBitmap(bitMap.width, bitMap.height, Bitmap.Config.ARGB_8888)
+                        val tempCanvas = Canvas(bitMap)
+                        tempCanvas.drawBitmap(bitMap, 10.0F, 10.0F, null)
+
+                        val randomX = (0..1000).random()
+                        val randomY = (0..1000).random()
+
+                        tempCanvas.drawLine(previousX, previousY, randomX.toFloat(), randomY.toFloat(), paint)
+                        image.setImageDrawable(BitmapDrawable(resources, bitMap))
+
+                        previousX = randomX.toFloat()
+                        previousY = randomY.toFloat()
+                    }
+                }
 
                /* if (coords != null) {
                     if (coords.xCoordinateValue.toFloat() != x || coords.yCoordinateValue.toFloat() != y) {
