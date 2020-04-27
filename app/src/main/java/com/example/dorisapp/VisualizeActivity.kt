@@ -25,10 +25,9 @@ import org.json.JSONObject
 class VisualizeActivity: AppCompatActivity() {
 
     var previousX = 0F
-    var previousY = 0.00F
-    var firstTime = true
-    val paint : Paint = Paint(Color.BLACK)
-    val paintCollision : Paint = Paint(Color.RED)
+    var previousY = 0F
+    private val paint : Paint = Paint(Color.BLACK)
+    private val paintCollision : Paint = Paint(Color.RED)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,11 +36,12 @@ class VisualizeActivity: AppCompatActivity() {
         initializeContentView(R.layout.activity_visualize, findViewById(android.R.id.content), layoutInflater) //Adds activity_main.xml to current view
         initializeDrawerListeners(R.layout.activity_visualize, findViewById(android.R.id.content), this) //Initialize button listeners for navigation system
 
-            firstTime = true
             val image = setImageView()
             val bitMap = setBitMap(image)
 
-            getSession(image, bitMap)
+            // Commente out for now, need later
+            //getSession(image, bitMap)
+            getListOfCordsForGraph("1", image, bitMap)
 
           /*  val handler = Handler(Looper.getMainLooper())
             handler.post(object : Runnable {
@@ -69,8 +69,6 @@ class VisualizeActivity: AppCompatActivity() {
     private fun getLatestCordsForGraph(image: ImageView, bitMap: Bitmap) {
 
         val statusText : TextView = findViewById(R.id.visualizeStatusText)
-        var x = 0
-        var y = 0
         val queue = Volley.newRequestQueue(this)
         val url = "https://us-central1-hulkdoris-4c6eb.cloudfunctions.net/api/positions/latest"
 
@@ -88,23 +86,15 @@ class VisualizeActivity: AppCompatActivity() {
                     val y = json.string("yCoord")
                     val collision = json.string("isCollision")
 
-                    if (x != null && y != null ) {
+                    if (x != null && y != null) {
                         val xFloat= x.toFloat()
                         val yFloat = y.toFloat()
-                        if (previousX != xFloat || previousY != yFloat) {
 
-                            if (firstTime) {
-                                previousX = bitMap.width / 2F
-                                previousY = bitMap.height / 2F
-                                firstTime = false
-                            }
+                        // TODO: Kolla timestamp här
 
-                            paint(xFloat, yFloat, collision!!.toBoolean(), bitMap, image)
-
-                            previousX = xFloat
-                            previousY = yFloat
+                        paint(xFloat, yFloat, collision!!.toBoolean(), bitMap, image)
                             //val tempBitmap : Bitmap = Bitmap.createBitmap(bitMap.width, bitMap.height, Bitmap.Config.ARGB_8888)
-                        }
+
                     }
 
                 },
@@ -124,15 +114,11 @@ class VisualizeActivity: AppCompatActivity() {
 
     private fun getListOfCordsForGraph(session: String?, image : ImageView, bitMap : Bitmap) {
 
-        var x : Float = 0.0F
-        var y : Float = 0.0F
-        var previousX : Float = 0.0F
-        var previousY : Float = 0.0F
-
-        println(session)
-
         val queue = Volley.newRequestQueue(this)
-        val url = "https://us-central1-hulkdoris-4c6eb.cloudfunctions.net/api/positions/session/$session"
+        val url = "https://us-central1-hulkdoris-4c6eb.cloudfunctions.net/api/positions/sessions/2"
+
+        previousX = bitMap.width / 2F
+        previousY = bitMap.height / 2F
 
         //tempCanvas.drawBitmap(bitMap, 0.0F, 0.0F, null)
         try {
@@ -140,11 +126,18 @@ class VisualizeActivity: AppCompatActivity() {
 
                 Response.Listener {
                     val parser : Parser = Parser.default()
-                    val pos = it.getString("positions")
-                    val stringBuilder : java.lang.StringBuilder = java.lang.StringBuilder(pos)
-                    val json : JsonObject = parser.parse(stringBuilder) as JsonObject
-                    println(json)
+                    val posArray = it.getString("positions")
+                    val stringBuilder : StringBuilder = StringBuilder(posArray)
+                    val array : JsonArray<JsonObject> = parser.parse(stringBuilder) as JsonArray<JsonObject>
+                    println(array)
 
+                    array.forEach{i -> i
+                        val x : Float = i.string("xCoord")!!.toFloat()
+                        println(x)
+                        val y: Float = i.string("yCoord")!!.toFloat()
+                        val collision = i.boolean("isCollision")
+                        paint(x, y, collision, bitMap, image)
+                    }
 
                 },
 
@@ -199,18 +192,22 @@ class VisualizeActivity: AppCompatActivity() {
             println(error)
         }
 
-
     }
 
-    private fun paint(x : Float, y : Float, collision : Boolean, bitMap : Bitmap, image : ImageView) {
+    private fun paint(x : Float, y : Float, collision : Boolean?, bitMap : Bitmap, image : ImageView) {
+
+        val origoX = bitMap.width / 2F
+        val origoY = bitMap.height / 2F
 
         val tempCanvas = Canvas(bitMap)
         tempCanvas.drawBitmap(bitMap, 0F, 0F, null)
 
-        if (collision) {
+        if (collision!!) {
             tempCanvas.drawPoint(x, y, paintCollision)
         }
-        tempCanvas.drawLine(previousX, previousY, x, y, paint)
+        tempCanvas.drawLine(previousX,previousY, previousX+x, previousY-y, paint)
+        previousX += x
+        previousY += y
         image.setImageDrawable(BitmapDrawable(resources, bitMap))
     }
 
