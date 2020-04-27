@@ -44,4 +44,20 @@ class RemoteActivity: AppCompatActivity() {
         }
     }
 
+    fun driveForward() {
+        // Do something
+    }
+
+    fun driveLeft() {
+        // Do something
+    }
+
+    fun driveRight() {
+        // Do something
+    }
+
+    fun driveBackwards() {
+        // Do something
+    }
+
 }
