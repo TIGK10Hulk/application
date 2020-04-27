@@ -113,6 +113,9 @@ class BluetoothLeService : Service() {
 
         m_deviceAddress = deviceAddress;
         m_bluetoothGatt = device.connectGatt(this, false, gattCallback)
+
+        Log.i(m_TAG, BluetoothGatt.GATT_SUCCESS.toString());
+
         m_BLUETOOTH_CONNECTED = true;
         Log.i(m_TAG, "We are connnected to Gatt server on Doris")
         return true
