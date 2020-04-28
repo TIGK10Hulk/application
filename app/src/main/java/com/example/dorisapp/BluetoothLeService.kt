@@ -157,7 +157,6 @@ class BluetoothLeService : Service() {
                 m_bluetoothGattService = m_bluetoothGatt!!.getService(BLEConstants.SERVICE_UUID_ROBOT)
                 Log.i(m_TAG, m_bluetoothGattService.toString())
 
-
                 val writeCharacteristic = findCharacteristicsFromDevice(BLEConstants.MAC_ADDRESS, BLEConstants.CHAR_UUID_ROBOT_WRITE)
                 if(writeCharacteristic == null) {
                     Log.e(m_TAG, "$writeCharacteristic is null")
@@ -166,9 +165,6 @@ class BluetoothLeService : Service() {
                     m_bluetoothGattCharacteristic = writeCharacteristic
                 }
 
-
-
-
                 val readCharacteristic = findCharacteristicsFromDevice(BLEConstants.MAC_ADDRESS, BLEConstants.CHAR_UUID_ROBOT_READ)
                 if(readCharacteristic == null) {
 
@@ -176,14 +172,8 @@ class BluetoothLeService : Service() {
                     return
                 }
                 m_bluetoothGattReadCharacteristic = readCharacteristic
+
                 gatt!!.setCharacteristicNotification(readCharacteristic, true)
-
-                /*
-                Log.i(m_TAG, "DESCRIPTORS: " + readCharacteristic.descriptors)
-                for (discriptor in readCharacteristic.descriptors) {
-                    Log.i(m_TAG, discriptor.uuid.toString())
-                } */
-
                 val descriptor = readCharacteristic.getDescriptor(BLEConstants.DESCRIPTOR_UUID)
                 descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE)
                 gatt!!.writeDescriptor(descriptor)
@@ -304,6 +294,12 @@ class BluetoothLeService : Service() {
         mHandler.removeCallbacks(mRunnable)
     }
 
+    fun getDescriptorUUID(bluetoothGattCharacteristic: BluetoothGattCharacteristic) {
+        val descriptors = bluetoothGattCharacteristic.descriptors
+        for (descriptor in descriptors) {
+            Log.i(m_TAG, "Descriptors in given characteristic: " + descriptor.uuid.toString())
+        }
+    }
 
 
     //Test functions to check if the service correctly receives and sends data
