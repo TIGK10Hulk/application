@@ -1,12 +1,7 @@
 package com.example.dorisapp
 
-import android.R.attr
-import android.R.attr.bitmap
 import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
-import android.graphics.drawable.ColorDrawable
-import android.graphics.drawable.ShapeDrawable
-import android.graphics.drawable.shapes.OvalShape
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -39,7 +34,6 @@ class VisualizeActivity: AppCompatActivity() {
             val image = setImageView()
             val bitMap = setBitMap(image)
 
-            // Commente out for now, need later
             getSession(image, bitMap)
 
             val handler = Handler(Looper.getMainLooper())
