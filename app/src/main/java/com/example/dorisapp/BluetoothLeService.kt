@@ -157,13 +157,14 @@ class BluetoothLeService : Service() {
                 m_bluetoothGattService = m_bluetoothGatt!!.getService(BLEConstants.SERVICE_UUID_ROBOT)
                 Log.i(m_TAG, m_bluetoothGattService.toString())
 
-/*
+
                 val writeCharacteristic = findCharacteristicsFromDevice(BLEConstants.MAC_ADDRESS, BLEConstants.CHAR_UUID_ROBOT_WRITE)
                 if(writeCharacteristic == null) {
                     Log.e(m_TAG, "$writeCharacteristic is null")
                 } else {
                     Log.i(m_TAG, "THis is characteristic:  $writeCharacteristic")
-                } */
+                    m_bluetoothGattCharacteristic = writeCharacteristic
+                }
 
 
 
@@ -275,7 +276,7 @@ class BluetoothLeService : Service() {
             val characteristic : BluetoothGattCharacteristic? = service!!.getCharacteristic(characteristicUUID)
             if(characteristic != null) {
                 Log.i(m_TAG, "CHAR : " + characteristic.toString())
-                m_bluetoothGattCharacteristic = characteristic
+                //m_bluetoothGattCharacteristic = characteristic
                 return characteristic
             }
         }
