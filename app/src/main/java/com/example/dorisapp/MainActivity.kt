@@ -15,7 +15,7 @@ import com.google.android.material.navigation.NavigationView
 
 class MainActivity : AppCompatActivity() {
 
-    var start : Boolean = true;
+    var start : Boolean = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,17 +27,20 @@ class MainActivity : AppCompatActivity() {
 
     fun startAndStop(view: View) {
 
-        var parkButton : Button = findViewById(R.id.parkButton)
-        var statusText : TextView = findViewById(R.id.drivingStatusTextView)
+        val parkButton : Button = findViewById(R.id.parkButton)
+        val statusText : TextView = findViewById(R.id.drivingStatusTextView)
 
         if (start) {
-            var startButton : Button = findViewById(R.id.startAndStopButton)
+            /*sendCoordinate(this)*/
+            /*val testCoord = Coord(105, 105, false, session = 1)
+            sendCoordinate(this, testCoord)*/
+            val startButton : Button = findViewById(R.id.startAndStopButton)
             startButton.text = "Stop"
             statusText.text = "Driving"
             parkButton.isEnabled = false
             start = false
         } else {
-            var stopButton : Button = findViewById(R.id.startAndStopButton)
+            val stopButton : Button = findViewById(R.id.startAndStopButton)
             stopButton.text = "Start"
             statusText.text = "Idle"
             parkButton.isEnabled = true
