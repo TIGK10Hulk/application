@@ -1,13 +1,28 @@
 package com.example.dorisapp
 
+import android.graphics.*
+import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import com.jjoe64.graphview.GraphView
-import com.jjoe64.graphview.series.DataPoint
-import com.jjoe64.graphview.series.LineGraphSeries
-import kotlin.math.sinh
+import com.android.volley.Request
+import com.android.volley.Response
+import com.android.volley.toolbox.JsonObjectRequest
+import com.android.volley.toolbox.Volley
+import com.beust.klaxon.JsonArray
+import com.beust.klaxon.JsonObject
+import com.beust.klaxon.Parser
+import org.json.JSONException
+
 
 class VisualizeActivity: AppCompatActivity() {
+
+    var previousX = 0F
+    var previousY = 0F
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -16,26 +31,185 @@ class VisualizeActivity: AppCompatActivity() {
         initializeContentView(R.layout.activity_visualize, findViewById(android.R.id.content), layoutInflater) //Adds activity_main.xml to current view
         initializeDrawerListeners(R.layout.activity_visualize, findViewById(android.R.id.content), this) //Initialize button listeners for navigation system
 
-        var x: Double = 0.0
-        var y: Double = 0.0
+            val image = setImageView()
+            val bitMap = setBitMap(image)
 
-        var graph : GraphView = findViewById(R.id.graph)
-        var series : LineGraphSeries<DataPoint> = LineGraphSeries<DataPoint>()
+            getSession(image, bitMap)
 
-        x = -0.5
+            val handler = Handler(Looper.getMainLooper())
+            handler.post(object : Runnable {
+                override fun run() {
+                    getLatestCordsForGraph(image, bitMap)
+                    handler.postDelayed(this, 3000)
+                }
+            })
 
-        for (i in 0..50)
-        {
-            x += 0.1
-            y = sinh(x)
-            series.appendData(DataPoint(x,y), true, 500)
-        }
-
-        graph.addSeries(series)
-        // val series: LineGraphSeries<DataPoint> = LineGraphSeries {DataPoint(0.1, 0.2)}
     }
 
+    private fun setImageView() : ImageView {
 
+        val image: ImageView = findViewById(R.id.chart)
+        return image
 
+    }
+
+    private fun setBitMap(image : ImageView) : Bitmap {
+
+        return Bitmap.createBitmap(1000, 1000, Bitmap.Config.ARGB_8888)
+    }
+
+    private fun getLatestCordsForGraph(image: ImageView, bitMap: Bitmap) {
+
+        val statusText : TextView = findViewById(R.id.visualizeStatusText)
+        val queue = Volley.newRequestQueue(this)
+        val url = "https://us-central1-hulkdoris-4c6eb.cloudfunctions.net/api/positions/latest"
+
+        try {
+            val jsonObjectRequest = JsonObjectRequest(Request.Method.GET, url, null,
+
+                // On Success
+                Response.Listener {
+
+                    val parser: Parser = Parser.default()
+                    val stringBuilder: StringBuilder = StringBuilder(it.toString())
+                    val json: JsonObject = parser.parse(stringBuilder) as JsonObject
+                    val x = json.string("xCoord")
+                    val y = json.string("yCoord")
+                    val collision = json.boolean("isCollision")
+
+                    if (x != null && y != null) {
+                        val xFloat= x.toFloat()
+                        val yFloat = y.toFloat()
+
+                        if (previousX != xFloat || previousY != yFloat) {
+
+                            paint(xFloat, yFloat, collision!!, bitMap, image)
+                        }
+                    }
+
+                },
+
+                Response.ErrorListener { error -> error
+                    println(error)
+                    statusText.text = resources.getString(R.string.visualize_coord_error)
+
+                }
+            )
+            queue.add(jsonObjectRequest)
+            statusText.text = resources.getString(R.string.visualize_coord_success)
+        } catch (error : JSONException) {
+            statusText.text = resources.getString(R.string.visualize_coord_error)
+        }
+
+    }
+
+    private fun getListOfCordsForGraph(session: String?, image : ImageView, bitMap : Bitmap) {
+
+        val queue = Volley.newRequestQueue(this)
+        val url = "https://us-central1-hulkdoris-4c6eb.cloudfunctions.net/api/positions/sessions/$session"
+
+        previousX = bitMap.width / 2F
+        previousY = bitMap.height / 2F
+
+        try {
+            val jsonArrayRequest = JsonObjectRequest(Request.Method.GET, url, null,
+
+                Response.Listener {
+                    val parser : Parser = Parser.default()
+                    val posArray = it.getString("positions")
+                    val stringBuilder : StringBuilder = StringBuilder(posArray)
+                    val array : JsonArray<JsonObject> = parser.parse(stringBuilder) as JsonArray<JsonObject>
+                    println(array.toJsonString())
+
+                    array.forEach{i -> i
+                        val x : Float = i.string("xCoord")!!.toFloat()
+                        val y: Float = i.string("yCoord")!!.toFloat()
+                        val collision = i.boolean("isCollision")
+                        paint(x, y, collision, bitMap, image)
+                    }
+
+                },
+
+                Response.ErrorListener { error -> error
+                    println(error)
+
+                })
+            queue.add(jsonArrayRequest)
+        } catch (error : JSONException) {
+
+        }
+
+    }
+
+    private fun getSession(image : ImageView, bitMap : Bitmap) {
+
+        val statusText : TextView = findViewById(R.id.visualizeStatusText)
+        val queue = Volley.newRequestQueue(this)
+        val url = "https://us-central1-hulkdoris-4c6eb.cloudfunctions.net/api/positions/latest"
+
+        try {
+            val jsonObjectRequest = JsonObjectRequest(Request.Method.GET, url, null,
+
+                // On Success
+                Response.Listener {
+
+                    val parser: Parser = Parser.default()
+
+                    val stringBuilder: StringBuilder = StringBuilder(it.toString())
+                    val json: JsonObject = parser.parse(stringBuilder) as JsonObject
+                    val session = json.string("session")
+
+                    if (session != null) {
+                        statusText.text = resources.getString(R.string.visualize_coord_success)
+                        getListOfCordsForGraph(session, image, bitMap)
+
+                    } else {
+                        statusText.text = resources.getString(R.string.visualize_coord_error)
+                    }
+                },
+
+                Response.ErrorListener { error -> error
+                    println(error)
+                    statusText.text = resources.getString(R.string.visualize_coord_error)
+
+                }
+            )
+            queue.add(jsonObjectRequest)
+        } catch (error : JSONException) {
+            statusText.text = resources.getString(R.string.visualize_coord_error)
+            println(error)
+        }
+
+    }
+
+    private fun paint(x : Float, y : Float, collision : Boolean?, bitMap : Bitmap, image : ImageView) {
+
+        val paint = Paint(Color.BLACK)
+        paint.strokeWidth = 3F
+
+        val origoX = bitMap.width / 2F
+        val origoY = bitMap.height / 2F
+        var fixedX = origoX + (x * 6)
+        var fixedY = origoY - (y * 6)
+
+        println("x: $x")
+        println("y: $y")
+
+        val tempCanvas = Canvas(bitMap)
+        tempCanvas.drawBitmap(bitMap, 0F,0F, null)
+
+        tempCanvas.drawLine(previousX, previousY, fixedX, fixedY, paint)
+
+        if (collision!!) {
+            paint.color = Color.RED
+            tempCanvas.drawOval(fixedX - 8, fixedY - 8, fixedX + 8, fixedY + 8, paint)
+        }
+
+        image.setImageDrawable(BitmapDrawable(resources, bitMap))
+
+        previousX = fixedX
+        previousY = fixedY
+    }
 
 }
+
