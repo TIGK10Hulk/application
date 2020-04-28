@@ -157,13 +157,18 @@ class BluetoothLeService : Service() {
                 val writeCharacteristic = findCharacteristicsFromDevice(BLEConstants.MAC_ADDRESS, BLEConstants.CHAR_UUID_ROBOT_WRITE)
                 if(writeCharacteristic == null) {
                     Log.e(m_TAG, "$writeCharacteristic is null")
+                } else {
+                    Log.i(m_TAG, "THis is characteristic:  $writeCharacteristic")
                 }
+                /*
                 val readCharacteristic = findCharacteristicsFromDevice(BLEConstants.MAC_ADDRESS, BLEConstants.CHAR_UUID_ROBOT_READ)
                 if(readCharacteristic == null) {
                     Log.e(m_TAG, "$readCharacteristic is null")
                     return
                 }
                 gatt!!.setCharacteristicNotification(readCharacteristic, true)
+                */
+
 
             } else {
                 Log.w(m_TAG, "onServicesdeicovered: " + status)
@@ -193,7 +198,7 @@ class BluetoothLeService : Service() {
         ) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 //TODO say we have written data
-                Log.i(TAG, "Data written $characteristic")
+                Log.i(m_TAG, "Data written $characteristic")
                 Thread.sleep(1000)
                 //TODO broadcast intent that says we have written data
                 broadcastUpdate(BLEConstants.ACTION_DATA_WRITTEN, characteristic)

@@ -68,16 +68,15 @@ class RemoteActivity: AppCompatActivity() {
 
             when(action) {
                 BLEConstants.ACTION_DATA_WRITTEN -> {
-                    val data = intent.getByteArrayExtra(BLEConstants.EXTRA_DATA)
-                    toast("You have written to robot: " + data)
-                    Log.i(m_TAG, "DATA WRITTEN $data")
+                    val data = intent.getStringExtra(BLEConstants.EXTRA_DATA)
+                    toast("You have written to robot: " + data.toString())
+                    Log.i(m_TAG, "DATA WRITTEN ${data.toString()}")
                 }
                 BLEConstants.ACTION_GATT_CONNECTED -> {
                     toast("You are now connected to Gatt server on the robot")
                 }
             }
         }
-
     }
     
    //Returns an object used to access public methods of the bluetooth service
