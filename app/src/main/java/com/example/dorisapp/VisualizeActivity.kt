@@ -4,6 +4,9 @@ import android.R.attr
 import android.R.attr.bitmap
 import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.ShapeDrawable
+import android.graphics.drawable.shapes.OvalShape
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -24,8 +27,7 @@ class VisualizeActivity: AppCompatActivity() {
 
     var previousX = 0F
     var previousY = 0F
-    private val paint : Paint = Paint(Color.BLACK)
-    private val paintCollision : Paint = Paint(Color.YELLOW)
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -100,6 +102,7 @@ class VisualizeActivity: AppCompatActivity() {
                 }
             )
             queue.add(jsonObjectRequest)
+            statusText.text = resources.getString(R.string.visualize_coord_success)
         } catch (error : JSONException) {
             statusText.text = resources.getString(R.string.visualize_coord_error)
         }
@@ -113,7 +116,6 @@ class VisualizeActivity: AppCompatActivity() {
 
         previousX = bitMap.width / 2F
         previousY = bitMap.height / 2F
-        println("fuck")
 
         try {
             val jsonArrayRequest = JsonObjectRequest(Request.Method.GET, url, null,
@@ -188,6 +190,9 @@ class VisualizeActivity: AppCompatActivity() {
 
     private fun paint(x : Float, y : Float, collision : Boolean?, bitMap : Bitmap, image : ImageView) {
 
+        val paint = Paint(Color.BLACK)
+        paint.strokeWidth = 3F
+
         val origoX = bitMap.width / 2F
         val origoY = bitMap.height / 2F
         var fixedX = origoX + (x * 6)
@@ -196,28 +201,17 @@ class VisualizeActivity: AppCompatActivity() {
         println("x: $x")
         println("y: $y")
 
-        /* val matrix = Matrix()
-        matrix.reset()
-        matrix.postTranslate(
-            -bitMap.width / 2F,
-            -bitMap.height / 2F
-        ) // Centers image     matrix.postRotate(rotation);
-
-        matrix.postTranslate(x, y)
-
-         */
-
         val tempCanvas = Canvas(bitMap)
         tempCanvas.drawBitmap(bitMap, 0F,0F, null)
 
         tempCanvas.drawLine(previousX, previousY, fixedX, fixedY, paint)
-        image.setImageDrawable(BitmapDrawable(resources, bitMap))
 
         if (collision!!) {
-            tempCanvas.drawOval(fixedX - 5, fixedY - 5, fixedX + 5, fixedY + 5, paintCollision)
-            image.setImageDrawable(BitmapDrawable(resources, bitMap))
-
+            paint.color = Color.RED
+            tempCanvas.drawOval(fixedX - 8, fixedY - 8, fixedX + 8, fixedY + 8, paint)
         }
+
+        image.setImageDrawable(BitmapDrawable(resources, bitMap))
 
         previousX = fixedX
         previousY = fixedY
