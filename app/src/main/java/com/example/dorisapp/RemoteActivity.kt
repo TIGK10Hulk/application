@@ -49,7 +49,8 @@ class RemoteActivity: AppCompatActivity() {
     }
 
     fun turnRight(view: View) {
-        bluetoothService!!.getCharThenWrite(3)
+        //bluetoothService!!.getCharThenWrite(3)
+        bluetoothService!!.readChar()
     }
 
     private fun gattUpdateIntentFilter() : IntentFilter {

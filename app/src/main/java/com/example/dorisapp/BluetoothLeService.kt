@@ -22,6 +22,7 @@ class BLEConstants {
         var SERVICE_UUID_ROBOT_ALTERNATIVE: UUID = UUID.fromString("9e5d1e47-5c13-43a0-8635-82ad38a1386f")
         var CHAR_UUID_ROBOT_WRITE: UUID = UUID.fromString("0000ffe3-0000-1000-8000-00805f9b34fb")
         var CHAR_UUID_ROBOT_READ: UUID = UUID.fromString("0000ffe2-0000-1000-8000-00805f9b34fb")
+        var DESCRIPTOR_UUID: UUID = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
 
 
 
@@ -48,6 +49,8 @@ class BluetoothLeService : Service() {
     var m_bluetoothGattService: BluetoothGattService? = null
 
     var m_bluetoothGattCharacteristic: BluetoothGattCharacteristic? = null
+
+    var m_bluetoothGattReadCharacteristic: BluetoothGattCharacteristic? = null
 
     var m_BLUETOOTH_CONNECTED = false
     var m_REGISTERAPP_UUID: UUID = UUID.fromString("f564e90a-382c-4872-9d9e-256a81261116")
@@ -154,20 +157,36 @@ class BluetoothLeService : Service() {
                 m_bluetoothGattService = m_bluetoothGatt!!.getService(BLEConstants.SERVICE_UUID_ROBOT)
                 Log.i(m_TAG, m_bluetoothGattService.toString())
 
+/*
                 val writeCharacteristic = findCharacteristicsFromDevice(BLEConstants.MAC_ADDRESS, BLEConstants.CHAR_UUID_ROBOT_WRITE)
                 if(writeCharacteristic == null) {
                     Log.e(m_TAG, "$writeCharacteristic is null")
                 } else {
                     Log.i(m_TAG, "THis is characteristic:  $writeCharacteristic")
-                }
-                /*
+                } */
+
+
+
+
                 val readCharacteristic = findCharacteristicsFromDevice(BLEConstants.MAC_ADDRESS, BLEConstants.CHAR_UUID_ROBOT_READ)
                 if(readCharacteristic == null) {
+
                     Log.e(m_TAG, "$readCharacteristic is null")
                     return
                 }
+                m_bluetoothGattReadCharacteristic = readCharacteristic
                 gatt!!.setCharacteristicNotification(readCharacteristic, true)
-                */
+
+                /*
+                Log.i(m_TAG, "DESCRIPTORS: " + readCharacteristic.descriptors)
+                for (discriptor in readCharacteristic.descriptors) {
+                    Log.i(m_TAG, discriptor.uuid.toString())
+                } */
+
+                val descriptor = readCharacteristic.getDescriptor(BLEConstants.DESCRIPTOR_UUID)
+                descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE)
+                gatt!!.writeDescriptor(descriptor)
+
 
 
             } else {
@@ -209,7 +228,7 @@ class BluetoothLeService : Service() {
             gatt: BluetoothGatt?,
             characteristic: BluetoothGattCharacteristic?
         ) {
-            m_bluetoothGatt!!.readCharacteristic(characteristic)
+            Log.i(m_TAG, "WE ARE in charactersistici channnnnnnngeeeed:  " + "Value read: " + characteristic!!.value.toString())
         }
     }
 
@@ -221,7 +240,9 @@ class BluetoothLeService : Service() {
         writeCharacteristics(m_bluetoothGattCharacteristic!!, command)
     }
 
-
+    public fun readChar() {
+        m_bluetoothGatt!!.readCharacteristic(m_bluetoothGattReadCharacteristic)
+    }
 
     fun writeCharacteristics(characteristic: BluetoothGattCharacteristic, command: Int) {
         //check we access to BT radio
