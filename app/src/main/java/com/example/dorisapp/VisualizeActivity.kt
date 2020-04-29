@@ -23,7 +23,6 @@ class VisualizeActivity: AppCompatActivity() {
     var previousX = 0F
     var previousY = 0F
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_nav_drawer)
@@ -31,10 +30,18 @@ class VisualizeActivity: AppCompatActivity() {
         initializeContentView(R.layout.activity_visualize, findViewById(android.R.id.content), layoutInflater) //Adds activity_main.xml to current view
         initializeDrawerListeners(R.layout.activity_visualize, findViewById(android.R.id.content), this) //Initialize button listeners for navigation system
 
-            val image = setImageView()
-            val bitMap = setBitMap(image)
+        val image = setImageView()
+        val bitMap = setBitMap(image)
 
-            getSession(image, bitMap)
+        val tempCanvas = Canvas(bitMap)
+        tempCanvas.drawBitmap(bitMap, 0F,0F, null)
+
+        val axisPaint = Paint(Color.GRAY)
+        tempCanvas.drawLine(0F, bitMap.height / 2F, bitMap.width.toFloat(), bitMap.height / 2F, axisPaint)
+        tempCanvas.drawLine(bitMap.width / 2F, 0F, bitMap.width / 2F, bitMap.height.toFloat(), axisPaint)
+        image.setImageDrawable(BitmapDrawable(resources, bitMap))
+
+        getSession(image, bitMap)
 
             val handler = Handler(Looper.getMainLooper())
             handler.post(object : Runnable {
