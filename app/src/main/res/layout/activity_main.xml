@@ -42,7 +42,7 @@
         android:layout_centerHorizontal="true"
         android:textSize="20sp"
         android:text="@string/driving_status_default_text_view"
-        android:textColor="#FFFFFF"/>
+        android:textColor="@color/black"/>
 
     <ImageView
         android:id="@+id/dorisStatusImage"
