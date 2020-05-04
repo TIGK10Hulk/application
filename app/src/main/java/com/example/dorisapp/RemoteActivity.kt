@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
 import android.view.View
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
@@ -21,6 +22,9 @@ class RemoteActivity: AppCompatActivity() {
 
         initializeContentView(R.layout.activity_remote, findViewById(android.R.id.content), layoutInflater) //Adds activity_remote.xml to current view
         initializeDrawerListeners(R.layout.activity_remote, findViewById(android.R.id.content), this) //Initialize button listeners for navigation system
+
+        var toolbarTitle = findViewById<TextView>(R.id.toolbarTitle)
+        toolbarTitle.text = "Remote control"
 
         this.registerReceiver(gattUpdateReceiver, gattUpdateIntentFilter())
 

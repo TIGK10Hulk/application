@@ -38,13 +38,17 @@ class VisualizeActivity : AppCompatActivity() {
             this
         ) //Initialize button listeners for navigation system
 
+        var toolbarTitle = findViewById<TextView>(R.id.toolbarTitle)
+        toolbarTitle.text = "Coordinate graph"
+
         val image = setImageView()
         val bitMap = setBitMap(image)
 
         val tempCanvas = Canvas(bitMap)
         tempCanvas.drawBitmap(bitMap, 0F, 0F, null)
 
-        val axisPaint = Paint(Color.GRAY)
+        val axisPaint = Paint(Color.WHITE)
+        axisPaint.color = Color.WHITE
         tempCanvas.drawLine(
             0F,
             bitMap.height / 2F,

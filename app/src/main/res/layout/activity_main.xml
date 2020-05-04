@@ -4,33 +4,51 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    android:background="@drawable/main_animation"
+    tools:context=".MainActivity"
+    android:id="@+id/mainActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerHorizontal="true">
 
     <Button
         android:id="@+id/startAndStopButton"
         android:layout_width="190dp"
-        android:layout_height="60dp"
-        android:layout_centerHorizontal="true"
+        android:layout_height="50dp"
         android:layout_marginTop="500dp"
         android:text="@string/start_button"
-        android:onClick="startAndStop"/>
+        android:onClick="startAndStop"
+        android:background="@drawable/button"
+        android:layout_marginLeft="10dp"/>
 
     <Button
         android:id="@+id/parkButton"
         android:layout_width="190dp"
-        android:layout_height="60dp"
-        android:layout_below="@id/startAndStopButton"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="10dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="500dp"
         android:text="@string/park_button"
-        android:onClick="park"/>
+        android:background="@drawable/button"
+        android:onClick="park"
+        android:layout_marginLeft="10dp"/>
+    </LinearLayout>
 
     <TextView
         android:id="@+id/drivingStatusTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="250dp"
+        android:layout_marginTop="440dp"
         android:layout_centerHorizontal="true"
-        android:textSize="30sp"
-        android:text="@string/driving_status_default_text_view" />
+        android:textSize="20sp"
+        android:text="@string/driving_status_default_text_view"
+        android:textColor="@color/black"/>
+
+    <ImageView
+        android:id="@+id/dorisStatusImage"
+        android:layout_marginTop="80dp"
+        android:layout_centerHorizontal="true"
+        android:layout_width="wrap_content"
+        android:layout_height="340dp"
+        android:src="@drawable/doris2bw"/>
 </RelativeLayout>
