@@ -37,7 +37,7 @@ class RemoteActivity: AppCompatActivity() {
     }
 
     fun reverse(view: View) {
-        bluetoothService!!.getCharThenWrite(5)
+        bluetoothService!!.getCharThenWrite(6)
     }
 
     fun stop(view: View) {
@@ -45,12 +45,11 @@ class RemoteActivity: AppCompatActivity() {
     }
 
     fun turnLeft(view: View){
-        bluetoothService!!.getCharThenWrite(2)
+        bluetoothService!!.getCharThenWrite(4)
     }
 
     fun turnRight(view: View) {
-        //bluetoothService!!.getCharThenWrite(3)
-        bluetoothService!!.readChar()
+        bluetoothService!!.getCharThenWrite(5)
     }
 
     private fun gattUpdateIntentFilter() : IntentFilter {

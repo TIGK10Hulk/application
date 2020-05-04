@@ -24,8 +24,6 @@ class BLEConstants {
         var CHAR_UUID_ROBOT_READ: UUID = UUID.fromString("0000ffe2-0000-1000-8000-00805f9b34fb")
         var DESCRIPTOR_UUID: UUID = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
 
-
-
     }
 }
 
@@ -208,7 +206,7 @@ class BluetoothLeService : Service() {
         ) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 //TODO say we have written data
-                Log.i(m_TAG, "Data written $characteristic")
+                Log.i(m_TAG, "Data written ${characteristic.value.contentToString()}")
                 Thread.sleep(1000)
                 //TODO broadcast intent that says we have written data
                 broadcastUpdate(BLEConstants.ACTION_DATA_WRITTEN, characteristic)
@@ -219,7 +217,8 @@ class BluetoothLeService : Service() {
             gatt: BluetoothGatt?,
             characteristic: BluetoothGattCharacteristic?
         ) {
-            Log.i(m_TAG, "WE ARE in charactersistici channnnnnnngeeeed:  " + "Value read: " + characteristic!!.value.toString())
+            //Log.i(m_TAG, "WE ARE in charactersistici channnnnnnngeeeed:  " + "Value read: " + characteristic!!.value.toString())
+            parseByteArr(characteristic!!.value)
         }
     }
 
@@ -286,6 +285,45 @@ class BluetoothLeService : Service() {
     fun broadcastUpdate(action: String) {
         val intent = Intent(action)
         sendBroadcast(intent)
+    }
+
+    fun parseByteArr(byteArr: ByteArray) {
+        Log.i("ByteArr[0]:: ", byteArr[0].toInt().toString())
+
+        when(byteArr[0].toInt()) {
+            0 -> {
+                when(byteArr[1].toInt()){
+                    0 -> RobotData.manualControl = false
+                    1 -> RobotData.manualControl = true
+                }
+            }
+            1 -> {
+                RobotData.speed = byteArr[1].toInt()
+            }
+            2 -> {
+                RobotData.xPosition += 1
+            }
+            3 -> {
+                RobotData.yPosition += 1
+            }
+            4 -> {
+                RobotData.xPosition -= 1
+            }
+            5 -> {
+                RobotData.yPosition -= 1
+            }
+            6 -> {
+                RobotData.xPosition += 1
+                RobotData.yPosition += 1
+            }
+            7 -> {
+                RobotData.xPosition -= 1
+                RobotData.yPosition -= 1
+            }
+
+
+            //todo Update backend with new values
+        }
     }
 
     override fun onDestroy() {
