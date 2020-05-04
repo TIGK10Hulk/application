@@ -2,6 +2,9 @@ package com.example.dorisapp
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MenuItem
@@ -9,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.RelativeLayout
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -22,6 +26,7 @@ fun initializeDrawerListeners(currentLayout: Int, view: View, context: Context){
     //Set up the listeners for each item on the drawer menu
     val menuBar = view.findViewById<NavigationView>(R.id.nav_view)
     val drawerLayout = view.findViewById<DrawerLayout>(R.id.drawer_layout)
+
     menuBar.setNavigationItemSelectedListener { item ->
         when (item.itemId) {
             R.id.nav_main_activity -> {

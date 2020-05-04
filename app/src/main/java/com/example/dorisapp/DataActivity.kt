@@ -34,6 +34,9 @@ class DataActivity : AppCompatActivity() {
         initializeContentView(R.layout.activity_data, findViewById(android.R.id.content), layoutInflater) //Adds activity_data.xml to current view
         initializeDrawerListeners(R.layout.activity_data, findViewById(android.R.id.content), this) //Initialize button listeners for navigation system
 
+        var toolbarTitle = findViewById<TextView>(R.id.toolbarTitle)
+        toolbarTitle.text = "Coordinate list"
+
         val dataRecycler = findViewById(R.id.dataRecycler) as RecyclerView
 
         dataRecycler.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
