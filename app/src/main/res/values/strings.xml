@@ -9,7 +9,8 @@
     <string name="arrow_pointing_downward">arrow pointing downward</string>
     <string name="arrow_pointing_to_the_left">arrow pointing to the left</string>
     <string name="arrow_pointing_to_the_right">arrow pointing to the right</string>
-    <string name="driving_status_default_text_view">Idle</string>
+    <string name="driving_status_default_text_view"> Doris is idle</string>
+    <string name="driving_status_driving_text_view">Doris is driving</string>
     <string name="status_text_visualize">Waiting for requests</string>
     <string name="visualize_coord_error">Couldn\'t get coordinates, trying again</string>
     <string name="visualize_coord_success">Plotting route for mower..</string>
