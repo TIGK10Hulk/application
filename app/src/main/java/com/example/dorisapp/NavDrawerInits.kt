@@ -11,9 +11,11 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
@@ -26,6 +28,16 @@ fun initializeDrawerListeners(currentLayout: Int, view: View, context: Context){
     //Set up the listeners for each item on the drawer menu
     val menuBar = view.findViewById<NavigationView>(R.id.nav_view)
     val drawerLayout = view.findViewById<DrawerLayout>(R.id.drawer_layout)
+
+    val hamburgerButton = view.findViewById<ImageButton>(R.id.nav_hamburger_button)
+
+    hamburgerButton.setOnClickListener{
+        if(drawerLayout.isDrawerOpen(GravityCompat.START)){
+            drawerLayout.closeDrawer(GravityCompat.START)
+        } else {
+            drawerLayout.openDrawer(GravityCompat.START)
+        }
+    }
 
     menuBar.setNavigationItemSelectedListener { item ->
         when (item.itemId) {
