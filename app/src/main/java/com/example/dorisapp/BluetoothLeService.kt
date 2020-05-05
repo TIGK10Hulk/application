@@ -64,15 +64,24 @@ class BluetoothLeService : Service() {
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
+        for(x in 1..10){
+            println("&&&&&&&&&&& adding coord $x")
+            val newCoord = Coord(x, x+1, false, 1)
+            RobotData.unpushedCoords?.add(newCoord)
+        }
 
         // Do a periodic task
         mHandler = Handler()
         mRunnable = Runnable {
+            pushListOfCoordinates(this, RobotData.unpushedCoords)
+            /*
             if(isBluetoothLEConnected()) {
                 //TODO hantera läs skriv
             } else {
                 init()
             }
+            */
+            //mHandler.postDelayed(mRunnable, 2000)
         }
         mHandler.postDelayed(mRunnable, 2000)
         //Line 38 needs to be recalled as soon as the previous call has been finished
@@ -217,8 +226,18 @@ class BluetoothLeService : Service() {
             gatt: BluetoothGatt?,
             characteristic: BluetoothGattCharacteristic?
         ) {
-            //Log.i(m_TAG, "WE ARE in charactersistici channnnnnnngeeeed:  " + "Value read: " + characteristic!!.value.toString())
+            //Log.i(m_TAG, "WE ARE in charactersistici channnnnnnngeeeed:  " + "Value read: " + characteristic!!.value.contentToString())
             parseByteArr(characteristic!!.value)
+
+            //Add new coordinate to list of coordinates not pushed to backend
+            val newCoord = Coord(RobotData.xPosition, RobotData.yPosition, false, 1)
+            if(RobotData.unpushedCoords!!.isEmpty()){
+                RobotData.unpushedCoords!!.add(newCoord)
+            } else if(newCoord != RobotData.unpushedCoords!!.last()){
+                RobotData.unpushedCoords!!.add(newCoord)
+            }
+
+            Log.i(m_TAG, RobotData.unpushedCoords.toString())
         }
     }
 
@@ -240,7 +259,7 @@ class BluetoothLeService : Service() {
             return
         }
         var byteArray:ByteArray? = null
-        byteArray = byteArrayOf(command.toByte())
+        byteArray = byteArrayOf(command.toByte(), 2.toByte(), 3.toByte())
         characteristic.value = byteArray
 
         Log.i(m_TAG, "I AM IN WRITECHARACTERISTICS: " + "bytaarray: " + byteArray.toString() +"Properties: "+ characteristic.properties.toInt() +" charValue: " + characteristic.value)
@@ -288,7 +307,7 @@ class BluetoothLeService : Service() {
     }
 
     fun parseByteArr(byteArr: ByteArray) {
-        Log.i("ByteArr[0]:: ", byteArr[0].toInt().toString())
+        Log.i("ByteArr::", byteArr.contentToString())
 
         when(byteArr[0].toInt()) {
             0 -> {
@@ -320,7 +339,6 @@ class BluetoothLeService : Service() {
                 RobotData.xPosition -= 1
                 RobotData.yPosition -= 1
             }
-
 
             //todo Update backend with new values
         }
