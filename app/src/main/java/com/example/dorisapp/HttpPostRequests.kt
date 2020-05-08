@@ -41,8 +41,8 @@ fun pushListOfCoordinates(context: Context, coords: ArrayList<Coord>?) {
 
     var jsonArray: JSONArray = JSONArray(stringList)
     println("JSONARR:::: $jsonArray")
-    val url = "https://us-central1-hulkdoris-4c6eb.cloudfunctions.net/api/positions/latest/array"
-
+    val url = "https://us-central1-hulkdoris-4c6eb.cloudfunctions.net/api/positions/array"
+    /*
     val queue = Volley.newRequestQueue(context)
     val jsonArrayRequest = JsonArrayRequest(
         Request.Method.POST, url, jsonArray,
@@ -54,6 +54,7 @@ fun pushListOfCoordinates(context: Context, coords: ArrayList<Coord>?) {
 
     //Todo push list of coords to the backend
     queue.add(jsonArrayRequest)
+    */
     //After List of Coordinates has been pushed, reset list to null
     //RobotData.unpushedCoords = null
 

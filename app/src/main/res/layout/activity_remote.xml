@@ -11,21 +11,21 @@
         android:id="@+id/forwardButton"
         android:layout_width="100dp"
         android:layout_height="75dp"
+        android:background="@drawable/button"
         android:contentDescription="@string/arrow_pointing_upward"
         android:onClick="drive"
         app:layout_constraintBottom_toTopOf="@+id/reverseButton"
         app:layout_constraintEnd_toStartOf="@+id/turnRightButton"
         app:layout_constraintStart_toEndOf="@+id/turnLeftButton"
         app:layout_constraintTop_toTopOf="@+id/turnLeftButton"
-        app:srcCompat="@drawable/ic_arrow_upward"
-        android:background="@drawable/button"/>
+        app:srcCompat="@drawable/ic_arrow_upward" />
 
     <ImageButton
         android:id="@+id/reverseButton"
         android:layout_width="100dp"
         android:layout_height="75dp"
         android:contentDescription="@string/arrow_pointing_downward"
-        android:onClick="stop"
+        android:onClick="reverse"
         app:layout_constraintEnd_toStartOf="@+id/turnRightButton"
         app:layout_constraintStart_toEndOf="@+id/turnLeftButton"
         app:layout_constraintTop_toBottomOf="@+id/forwardButton"
@@ -36,14 +36,14 @@
         android:id="@+id/turnLeftButton"
         android:layout_width="64dp"
         android:layout_height="150dp"
+        android:background="@drawable/remote_button_left"
         android:contentDescription="@string/arrow_pointing_to_the_left"
+        android:onClick="turnLeft"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/turnRightButton"
-        android:onClick="turnLeft"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_arrow_left"
-        android:background="@drawable/remote_button_left"/>
+        app:srcCompat="@drawable/ic_arrow_left" />
 
     <ImageButton
         android:id="@+id/turnRightButton"
@@ -63,6 +63,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Stop"
+        android:onClick="stop"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

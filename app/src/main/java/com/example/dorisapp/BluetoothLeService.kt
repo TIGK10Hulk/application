@@ -64,6 +64,7 @@ class BluetoothLeService : Service() {
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
+
         for(x in 1..10){
             println("&&&&&&&&&&& adding coord $x")
             val newCoord = Coord(x, x+1, false, 1)
@@ -74,13 +75,14 @@ class BluetoothLeService : Service() {
         mHandler = Handler()
         mRunnable = Runnable {
             pushListOfCoordinates(this, RobotData.unpushedCoords)
-            /*
+            //sendCoordinate(this, RobotData.unpushedCoords!!.last())
+
             if(isBluetoothLEConnected()) {
                 //TODO hantera läs skriv
             } else {
                 init()
             }
-            */
+
             //mHandler.postDelayed(mRunnable, 2000)
         }
         mHandler.postDelayed(mRunnable, 2000)
@@ -241,25 +243,26 @@ class BluetoothLeService : Service() {
         }
     }
 
-    fun getCharThenWrite(command: Int) {
+    fun getCharThenWrite(action: Int, command: Int) {
         if(m_bluetoothGattCharacteristic == null) {
             Log.e(m_TAG, "ERROR in getCharThenWrite")
             return
         }
-        writeCharacteristics(m_bluetoothGattCharacteristic!!, command)
+        writeCharacteristics(m_bluetoothGattCharacteristic!!, action, command)
     }
 
     public fun readChar() {
         m_bluetoothGatt!!.readCharacteristic(m_bluetoothGattReadCharacteristic)
     }
 
-    fun writeCharacteristics(characteristic: BluetoothGattCharacteristic, command: Int) {
+    fun writeCharacteristics(characteristic: BluetoothGattCharacteristic, action: Int, command: Int) {
         //check we access to BT radio
         if(m_bluetoothAdapter == null || m_bluetoothGatt == null) {
             return
         }
         var byteArray:ByteArray? = null
-        byteArray = byteArrayOf(command.toByte(), 2.toByte(), 3.toByte())
+
+        byteArray = byteArrayOf(action.toByte(),command.toByte())
         characteristic.value = byteArray
 
         Log.i(m_TAG, "I AM IN WRITECHARACTERISTICS: " + "bytaarray: " + byteArray.toString() +"Properties: "+ characteristic.properties.toInt() +" charValue: " + characteristic.value)
@@ -308,36 +311,36 @@ class BluetoothLeService : Service() {
 
     fun parseByteArr(byteArr: ByteArray) {
         Log.i("ByteArr::", byteArr.contentToString())
-
         when(byteArr[0].toInt()) {
             0 -> {
-                when(byteArr[1].toInt()){
-                    0 -> RobotData.manualControl = false
-                    1 -> RobotData.manualControl = true
-                }
+                if (byteArr[1].toInt() == 0) RobotData.manualControl = false else RobotData.manualControl = true
             }
             1 -> {
                 RobotData.speed = byteArr[1].toInt()
             }
             2 -> {
-                RobotData.xPosition += 1
-            }
-            3 -> {
-                RobotData.yPosition += 1
-            }
-            4 -> {
-                RobotData.xPosition -= 1
-            }
-            5 -> {
-                RobotData.yPosition -= 1
-            }
-            6 -> {
-                RobotData.xPosition += 1
-                RobotData.yPosition += 1
-            }
-            7 -> {
-                RobotData.xPosition -= 1
-                RobotData.yPosition -= 1
+                when(byteArr[1].toInt()){
+                    1 -> {
+                        RobotData.xPosition += 1
+                    }
+                    2 -> {
+                        RobotData.yPosition += 1
+                    }
+                    3 -> {
+                        RobotData.xPosition -= 1
+                    }
+                    4 -> {
+                        RobotData.yPosition -= 1
+                    }
+                    5 -> {
+                        RobotData.xPosition += 1
+                        RobotData.yPosition += 1
+                    }
+                    6 -> {
+                        RobotData.xPosition -= 1
+                        RobotData.yPosition -= 1
+                    }
+                }
             }
 
             //todo Update backend with new values
