@@ -33,8 +33,8 @@ class RemoteActivity: AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_nav_drawer)
 
-        initializeContentView(R.layout.activity_remote, findViewById(android.R.id.content), layoutInflater) //Adds activity_remote.xml to current view
-        initializeDrawerListeners(R.layout.activity_remote, findViewById(android.R.id.content), this) //Initialize button listeners for navigation system
+        HelperFunctions.initializeContentView(R.layout.activity_remote, findViewById(android.R.id.content), layoutInflater) //Adds activity_remote.xml to current view
+        HelperFunctions.initializeDrawerListeners(R.layout.activity_remote, findViewById(android.R.id.content), this) //Initialize button listeners for navigation system
 
         var toolbarTitle = findViewById<TextView>(R.id.toolbarTitle)
         toolbarTitle.text = "Remote control"
@@ -44,7 +44,6 @@ class RemoteActivity: AppCompatActivity() {
         //Initiate Service, start it and then bind to it.
         val serviceClass = BluetoothLeService::class.java
         val intent = Intent(applicationContext, serviceClass)
-        startService(intent)
         bindService(intent, myConnection, Context.BIND_AUTO_CREATE )
 
         buttonLeft = findViewById(R.id.turnLeftButton)
@@ -76,14 +75,14 @@ class RemoteActivity: AppCompatActivity() {
 
     fun turnLeft(view: View){
         if(bluetoothService!!.m_BLUETOOTH_CONNECTED) {
-            bluetoothService!!.getCharThenWrite(1,2)
+            bluetoothService!!.getCharThenWrite(1,4)
             setActiveButtonBackground(buttonLeft)
         }
     }
 
     fun turnRight(view: View) {
         if(bluetoothService!!.m_BLUETOOTH_CONNECTED) {
-            bluetoothService!!.getCharThenWrite(1,3)
+            bluetoothService!!.getCharThenWrite(1,5)
             setActiveButtonBackground(buttonRight)
         }
     }
@@ -127,8 +126,7 @@ class RemoteActivity: AppCompatActivity() {
             }
         }
     }
-    
-   //Returns an object used to access public methods of the bluetooth service
+    //Returns an object used to access public methods of the bluetooth service
     private val myConnection = object : ServiceConnection {
         override fun onServiceConnected(
             className: ComponentName,

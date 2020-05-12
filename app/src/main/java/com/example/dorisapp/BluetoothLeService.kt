@@ -74,7 +74,7 @@ class BluetoothLeService : Service() {
         // Do a periodic task
         mHandler = Handler()
         mRunnable = Runnable {
-            pushListOfCoordinates(this, RobotData.unpushedCoords)
+            //pushListOfCoordinates(this, RobotData.unpushedCoords)
             //sendCoordinate(this, RobotData.unpushedCoords!!.last())
 
             if(isBluetoothLEConnected()) {
@@ -85,7 +85,7 @@ class BluetoothLeService : Service() {
 
             //mHandler.postDelayed(mRunnable, 2000)
         }
-        mHandler.postDelayed(mRunnable, 2000)
+        mHandler.postDelayed(mRunnable, 3000)
         //Line 38 needs to be recalled as soon as the previous call has been finished
         //This is going to be the function that will loop and check for new data in the bluetooth stream
 
@@ -218,7 +218,7 @@ class BluetoothLeService : Service() {
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 //TODO say we have written data
                 Log.i(m_TAG, "Data written ${characteristic.value.contentToString()}")
-                Thread.sleep(1000)
+                Thread.sleep(100)
                 //TODO broadcast intent that says we have written data
                 broadcastUpdate(BLEConstants.ACTION_DATA_WRITTEN, characteristic)
             }
@@ -350,6 +350,7 @@ class BluetoothLeService : Service() {
     override fun onDestroy() {
         super.onDestroy()
         toast("Bluetooth Service Destroyed")
+        stopService(Intent(this, BluetoothLeService::class.java))
         mHandler.removeCallbacks(mRunnable)
     }
 

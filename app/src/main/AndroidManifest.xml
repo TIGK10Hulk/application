@@ -33,6 +33,7 @@
             android:name=".BluetoothLeService"
             android:enabled="true"
             android:exported="true"
+            android:stopWithTask="true"
             />
 
 

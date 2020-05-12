@@ -22,17 +22,18 @@ class VisualizeActivity : AppCompatActivity() {
 
     var previousX = 0F
     var previousY = 0F
+    lateinit var handler: Handler
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_nav_drawer)
 
-        initializeContentView(
+        HelperFunctions.initializeContentView(
             R.layout.activity_visualize,
             findViewById(android.R.id.content),
             layoutInflater
         ) //Adds activity_main.xml to current view
-        initializeDrawerListeners(
+        HelperFunctions.initializeDrawerListeners(
             R.layout.activity_visualize,
             findViewById(android.R.id.content),
             this
@@ -67,7 +68,7 @@ class VisualizeActivity : AppCompatActivity() {
 
         getSession(image, bitMap)
 
-        val handler = Handler(Looper.getMainLooper())
+        handler = Handler(Looper.getMainLooper())
         handler.post(object : Runnable {
             override fun run() {
                 getLatestCoord(image, bitMap)
@@ -75,6 +76,11 @@ class VisualizeActivity : AppCompatActivity() {
             }
         })
 
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        handler.removeCallbacksAndMessages(null)
     }
 
     private fun setImageView(): ImageView {
