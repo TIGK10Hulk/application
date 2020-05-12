@@ -67,8 +67,8 @@ class DataActivity : AppCompatActivity() {
                     val parser: Parser = Parser.default()
                     val stringBuilder: StringBuilder = StringBuilder(it.toString())
                     val json: JsonObject = parser.parse(stringBuilder) as JsonObject
-                    val x = json.string("xCoord")
-                    val y = json.string("yCoord")
+                    val x = json.int("xCoord").toString()
+                    val y = json.int("yCoord").toString()
                     val collision = json.boolean("isCollision")
 
                     if (x != null && y != null) {
@@ -118,8 +118,8 @@ class DataActivity : AppCompatActivity() {
 
                     array.forEach { i ->
                         i
-                        val x = i.string("xCoord")
-                        val y = i.string("yCoord")
+                        val x = i.int("xCoord").toString()
+                        val y = i.int("yCoord").toString()
                         val collision = i.boolean("isCollision")
                         dataItemList.add(CoordinateData("X: $x", "Y: $y", "Collision: $collision"))
 
@@ -155,7 +155,7 @@ class DataActivity : AppCompatActivity() {
 
                     val stringBuilder: StringBuilder = StringBuilder(it.toString())
                     val json: JsonObject = parser.parse(stringBuilder) as JsonObject
-                    val session = json.string("session")
+                    val session = json.int("session").toString()
 
                     if (session != null) {
                         getCoordArray(session)
