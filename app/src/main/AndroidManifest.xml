@@ -25,7 +25,6 @@
         </activity>
 
         <activity android:name=".DataActivity" android:theme="@style/AppTheme.NoActionBar"/>
-        <activity android:name=".MainInformationActivity" android:theme="@style/AppTheme.NoActionBar"/>
         <activity android:name=".RemoteActivity" android:theme="@style/AppTheme.NoActionBar"/>
         <activity android:name=".VisualizeActivity" android:theme="@style/AppTheme.NoActionBar"/>
 

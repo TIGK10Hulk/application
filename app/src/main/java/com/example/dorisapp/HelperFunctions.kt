@@ -72,13 +72,6 @@ class HelperFunctions {
                             context.startActivity(intent)
                         }
                     }
-                    R.id.nav_main_information_activity -> {
-                        drawerLayout.closeDrawers()
-                        if(currentLayout != R.layout.activity_main_information){
-                            val intent = Intent(context, MainInformationActivity::class.java)
-                            context.startActivity(intent)
-                        }
-                    }
                     R.id.nav_visualize_activity -> {
                         drawerLayout.closeDrawers()
                         if(currentLayout != R.layout.activity_visualize){
