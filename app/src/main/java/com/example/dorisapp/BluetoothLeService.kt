@@ -1,21 +1,26 @@
 package com.example.dorisapp
 
+import android.app.Activity
 import android.app.Service
 import android.bluetooth.*
-import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
 import android.os.Binder
 import android.os.Handler
 import android.os.IBinder
 import android.util.Log
+import android.view.View
+import android.widget.TextView
 import org.jetbrains.anko.toast
 import java.util.*
+
 
 class BLEConstants {
     companion object {
         const val ACTION_GATT_CONNECTED = "com.example.dorisapp.ACTION_GATT_CONNECTED"
+        const val ACTION_GATT_DISCONNECTED = "com.example.dorisapp.ACTION_GATT_DISCONNECTED"
         const val ACTION_DATA_WRITTEN = "com.example.dorisapp.ACTION_DATA_WRITTEN"
+        const val ACTION_DATA_READ = "com.example.dorisapp.ACTION_DATA_READ"
         const val EXTRA_DATA = "com.example.dorisapp.EXTRA_DATA"
         const val MAC_ADDRESS = "00:1B:10:65:FC:75"
         var SERVICE_UUID_ROBOT: UUID = UUID.fromString("0000ffe1-0000-1000-8000-00805f9b34fb")
@@ -64,26 +69,16 @@ class BluetoothLeService : Service() {
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
-
-        for(x in 1..10){
-            println("&&&&&&&&&&& adding coord $x")
-            val newCoord = Coord(x, x+1, false, 1)
-            RobotData.unpushedCoords?.add(newCoord)
-        }
-
         // Do a periodic task
         mHandler = Handler()
         mRunnable = Runnable {
             //pushListOfCoordinates(this, RobotData.unpushedCoords)
-            //sendCoordinate(this, RobotData.unpushedCoords!!.last())
 
-            if(isBluetoothLEConnected()) {
-                //TODO hantera läs skriv
-            } else {
+            if(!isBluetoothLEConnected()) {
                 init()
             }
 
-            //mHandler.postDelayed(mRunnable, 2000)
+            mHandler.postDelayed(mRunnable, 3000)
         }
         mHandler.postDelayed(mRunnable, 3000)
         //Line 38 needs to be recalled as soon as the previous call has been finished
@@ -101,47 +96,28 @@ class BluetoothLeService : Service() {
         if(m_bluetoothManager == null) {
                 m_bluetoothManager = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
             if(m_bluetoothManager == null) {
-                Log.e(m_TAG, "Unable to initialize BLuetoothManager" )
                 return false
             }
         }
 
         m_bluetoothAdapter = m_bluetoothManager!!.adapter
         if(m_bluetoothAdapter == null) {
-            Log.e(m_TAG, "Unable to get initialize BluetoothAdapter")
             return false
         }
         connect(BLEConstants.MAC_ADDRESS)
         return true
     }
 
-    private fun isEnabled(): Boolean {
-        return this.m_bluetoothAdapter!!.isEnabled
-    }
-
     private fun connect(deviceAddress: String?) : Boolean {
         val device = m_bluetoothAdapter!!.getRemoteDevice(deviceAddress)
 
         if(device == null || m_bluetoothAdapter == null) {
-            Log.e(m_TAG, "Cannot connect to device")
             return false
         }
 
-        Log.i(m_TAG,"Device object: " + device.toString())
-
         m_deviceAddress = deviceAddress;
         m_bluetoothGatt = device.connectGatt(this, false, gattCallback)
-
-        Log.i(m_TAG,"GATT_SUCCES code : " +BluetoothGatt.GATT_SUCCESS.toString());
-
-
-        if(m_bluetoothGatt != null) {
-            Log.i(m_TAG,"Services in connect: " + m_bluetoothGatt!!.services)
-        }
-
-
         m_BLUETOOTH_CONNECTED = true;
-        Log.i(m_TAG, "We are connnected to Gatt server on Doris")
         return true
     }
 
@@ -156,28 +132,21 @@ class BluetoothLeService : Service() {
                 broadcastUpdate(BLEConstants.ACTION_GATT_CONNECTED)
                 m_bluetoothGatt?.discoverServices()
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-                //TODO say we are disconnected
+                broadcastUpdate(BLEConstants.ACTION_GATT_DISCONNECTED)
             }
         }
 
         override fun onServicesDiscovered(gatt: BluetoothGatt?, status: Int) {
             if(status == BluetoothGatt.GATT_SUCCESS) {
-                Log.i(m_TAG,"SERVICES HÄR : "+ m_bluetoothGatt?.services.toString())
                 m_bluetoothGattService = m_bluetoothGatt!!.getService(BLEConstants.SERVICE_UUID_ROBOT)
-                Log.i(m_TAG, m_bluetoothGattService.toString())
 
                 val writeCharacteristic = findCharacteristicsFromDevice(BLEConstants.MAC_ADDRESS, BLEConstants.CHAR_UUID_ROBOT_WRITE)
-                if(writeCharacteristic == null) {
-                    Log.e(m_TAG, "$writeCharacteristic is null")
-                } else {
-                    Log.i(m_TAG, "THis is characteristic:  $writeCharacteristic")
+                if(writeCharacteristic != null) {
                     m_bluetoothGattCharacteristic = writeCharacteristic
                 }
 
                 val readCharacteristic = findCharacteristicsFromDevice(BLEConstants.MAC_ADDRESS, BLEConstants.CHAR_UUID_ROBOT_READ)
                 if(readCharacteristic == null) {
-
-                    Log.e(m_TAG, "$readCharacteristic is null")
                     return
                 }
                 m_bluetoothGattReadCharacteristic = readCharacteristic
@@ -186,11 +155,6 @@ class BluetoothLeService : Service() {
                 val descriptor = readCharacteristic.getDescriptor(BLEConstants.DESCRIPTOR_UUID)
                 descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE)
                 gatt!!.writeDescriptor(descriptor)
-
-
-
-            } else {
-                Log.w(m_TAG, "onServicesdeicovered: " + status)
             }
         }
 
@@ -204,8 +168,6 @@ class BluetoothLeService : Service() {
             when(status) {
                 BluetoothGatt.GATT_SUCCESS -> {
                     val dataInput = characteristic!!.value
-
-                    Log.i(m_TAG, "Successfully read from characteristics: $characteristic"+ "value: " + dataInput)
                 }
             }
         }
@@ -216,10 +178,7 @@ class BluetoothLeService : Service() {
                 status: Int
         ) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
-                //TODO say we have written data
-                Log.i(m_TAG, "Data written ${characteristic.value.contentToString()}")
                 Thread.sleep(100)
-                //TODO broadcast intent that says we have written data
                 broadcastUpdate(BLEConstants.ACTION_DATA_WRITTEN, characteristic)
             }
         }
@@ -228,9 +187,9 @@ class BluetoothLeService : Service() {
             gatt: BluetoothGatt?,
             characteristic: BluetoothGattCharacteristic?
         ) {
-            //Log.i(m_TAG, "WE ARE in charactersistici channnnnnnngeeeed:  " + "Value read: " + characteristic!!.value.contentToString())
             parseByteArr(characteristic!!.value)
-
+            broadcastUpdate(BLEConstants.ACTION_DATA_READ, characteristic)
+            println("******'Received: ${characteristic!!.value.contentToString()}")
             //Add new coordinate to list of coordinates not pushed to backend
             val newCoord = Coord(RobotData.xPosition, RobotData.yPosition, false, 1)
             if(RobotData.unpushedCoords!!.isEmpty()){
@@ -238,24 +197,17 @@ class BluetoothLeService : Service() {
             } else if(newCoord != RobotData.unpushedCoords!!.last()){
                 RobotData.unpushedCoords!!.add(newCoord)
             }
-
-            Log.i(m_TAG, RobotData.unpushedCoords.toString())
         }
     }
 
     fun getCharThenWrite(action: Int, command: Int) {
         if(m_bluetoothGattCharacteristic == null) {
-            Log.e(m_TAG, "ERROR in getCharThenWrite")
             return
         }
         writeCharacteristics(m_bluetoothGattCharacteristic!!, action, command)
     }
 
-    public fun readChar() {
-        m_bluetoothGatt!!.readCharacteristic(m_bluetoothGattReadCharacteristic)
-    }
-
-    fun writeCharacteristics(characteristic: BluetoothGattCharacteristic, action: Int, command: Int) {
+    private fun writeCharacteristics(characteristic: BluetoothGattCharacteristic, action: Int, command: Int) {
         //check we access to BT radio
         if(m_bluetoothAdapter == null || m_bluetoothGatt == null) {
             return
@@ -264,30 +216,18 @@ class BluetoothLeService : Service() {
 
         byteArray = byteArrayOf(action.toByte(),command.toByte())
         characteristic.value = byteArray
-
-        Log.i(m_TAG, "I AM IN WRITECHARACTERISTICS: " + "bytaarray: " + byteArray.toString() +"Properties: "+ characteristic.properties.toInt() +" charValue: " + characteristic.value)
-
         m_bluetoothGatt!!.writeCharacteristic(characteristic)
-
-        //TODO(write to char here?)
     }
 
     fun findCharacteristicsFromDevice(Mac_address: String, characteristicUUID: UUID) : BluetoothGattCharacteristic? {
-        Log.i(m_TAG, "I AM IN FIND CHAR")
 
         if(m_bluetoothGatt == null) {
-            Log.e(m_TAG, "BLuetoothgatt is null")
             return null;
         }
 
-        Log.i(m_TAG, m_bluetoothGatt!!.services.toString())
-
         for(service in m_bluetoothGatt!!.services) {
-            Log.i(m_TAG, "I AIM IN FOR LOOP")
             val characteristic : BluetoothGattCharacteristic? = service!!.getCharacteristic(characteristicUUID)
             if(characteristic != null) {
-                Log.i(m_TAG, "CHAR : " + characteristic.toString())
-                //m_bluetoothGattCharacteristic = characteristic
                 return characteristic
             }
         }
@@ -297,10 +237,8 @@ class BluetoothLeService : Service() {
 
     fun broadcastUpdate(action: String, characteristic: BluetoothGattCharacteristic?) {
         val intent = Intent(action)
-        //TODO format the characteristics and send a intent
         val data: ByteArray? = characteristic!!.value
-        intent.putExtra(BLEConstants.EXTRA_DATA, "$data")
-
+        intent.putExtra(BLEConstants.EXTRA_DATA, "${data!!.contentToString()}")
         sendBroadcast(intent)
     }
 
@@ -309,8 +247,8 @@ class BluetoothLeService : Service() {
         sendBroadcast(intent)
     }
 
+    //TODO fix the func below
     fun parseByteArr(byteArr: ByteArray) {
-        Log.i("ByteArr::", byteArr.contentToString())
         when(byteArr[0].toInt()) {
             0 -> {
                 if (byteArr[1].toInt() == 0) RobotData.manualControl = false else RobotData.manualControl = true
@@ -360,22 +298,4 @@ class BluetoothLeService : Service() {
             Log.i(m_TAG, "Descriptors in given characteristic: " + descriptor.uuid.toString())
         }
     }
-
-
-    //Test functions to check if the service correctly receives and sends data
-    fun testInData(data: String){
-        toast("received: $data")
-    }
-
-    fun testOutData(): String {
-        return("Hej från service")
-    }
-
-    fun sendCommand(input: String) {
-
-    }
-    fun disconnect() {
-
-    }
-
 }

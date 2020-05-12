@@ -51,21 +51,15 @@ class MainActivity : AppCompatActivity() {
         val statusText : TextView = findViewById(R.id.drivingStatusTextView)
         val statusImage : ImageView = findViewById(R.id.dorisStatusImage)
 
-        /*
         if(bluetoothService == null || !bluetoothService!!.m_BLUETOOTH_CONNECTED){
             return
         }
-        */
 
         if (start) {
-            /*sendCoordinate(this)*/
-            /*val testCoord = Coord(105, 105, false, session = 1)
-            sendCoordinate(this, testCoord)*/
             if(!isSessionActive){
                 RobotData.session += 1
                 isSessionActive = true
             }
-            println("SESSION::::::: ${RobotData.session}")
             val startButton : Button = findViewById(R.id.startAndPauseButton)
             startButton.text = "Pause"
             statusText.text = resources.getString(R.string.driving_status_driving_text_view)
@@ -99,11 +93,9 @@ class MainActivity : AppCompatActivity() {
             val binder = service as BluetoothLeService.MyLocalBinder
             bluetoothService = binder.getService()
             isBound = true
-            println("Bind connected")
         }
 
         override fun onServiceDisconnected(name: ComponentName) {
-            println("Bind disconnected")
             isBound = false
         }
     }

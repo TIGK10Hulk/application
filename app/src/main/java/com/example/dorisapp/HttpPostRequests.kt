@@ -1,13 +1,11 @@
 package com.example.dorisapp
 
 import android.content.Context
-import android.util.Log
 import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonArrayRequest
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
-import com.beust.klaxon.JsonArray
 import com.beust.klaxon.Klaxon
 import org.json.JSONArray
 import org.json.JSONObject
@@ -42,7 +40,7 @@ fun pushListOfCoordinates(context: Context, coords: ArrayList<Coord>?) {
     var jsonArray: JSONArray = JSONArray(stringList)
     println("JSONARR:::: $jsonArray")
     val url = "https://us-central1-hulkdoris-4c6eb.cloudfunctions.net/api/positions/array"
-    /*
+
     val queue = Volley.newRequestQueue(context)
     val jsonArrayRequest = JsonArrayRequest(
         Request.Method.POST, url, jsonArray,
@@ -54,8 +52,9 @@ fun pushListOfCoordinates(context: Context, coords: ArrayList<Coord>?) {
 
     //Todo push list of coords to the backend
     queue.add(jsonArrayRequest)
-    */
+
     //After List of Coordinates has been pushed, reset list to null
-    //RobotData.unpushedCoords = null
+    RobotData.unpushedCoords = null
+    RobotData.unpushedCoords = ArrayList()
 
 }

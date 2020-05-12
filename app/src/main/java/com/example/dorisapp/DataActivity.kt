@@ -1,11 +1,8 @@
 package com.example.dorisapp
 
-import android.graphics.Bitmap
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -83,19 +80,15 @@ class DataActivity : AppCompatActivity() {
 
                 Response.ErrorListener { error ->
                     error
-                    println(error)
-
                 }
             )
             queue.add(jsonObjectRequest)
         } catch (error: JSONException) {
 
         }
-
         val adapter = DataListAdapter (dataItemList)
 
         dataRecycler.adapter = adapter
-
     }
 
     private fun getCoordArray(session: String?) {
@@ -114,7 +107,6 @@ class DataActivity : AppCompatActivity() {
                     val stringBuilder: StringBuilder = StringBuilder(posArray)
                     val array: JsonArray<JsonObject> =
                         parser.parse(stringBuilder) as JsonArray<JsonObject>
-                    println(array.toJsonString())
 
                     array.forEach { i ->
                         i
@@ -129,14 +121,11 @@ class DataActivity : AppCompatActivity() {
 
                 Response.ErrorListener { error ->
                     error
-                    println(error)
-
                 })
             queue.add(jsonArrayRequest)
         } catch (error: JSONException) {
 
         }
-
     }
 
     private fun getSession() {
@@ -166,14 +155,10 @@ class DataActivity : AppCompatActivity() {
 
                 Response.ErrorListener { error ->
                     error
-                    println(error)
-
                 }
             )
             queue.add(jsonObjectRequest)
         } catch (error: JSONException) {
-            println(error)
         }
-
     }
 }

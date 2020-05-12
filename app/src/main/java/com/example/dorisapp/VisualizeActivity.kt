@@ -159,7 +159,6 @@ class VisualizeActivity : AppCompatActivity() {
                     val stringBuilder: StringBuilder = StringBuilder(posArray)
                     val array: JsonArray<JsonObject> =
                         parser.parse(stringBuilder) as JsonArray<JsonObject>
-                    println(array.toJsonString())
 
                     array.forEach { i ->
                         i

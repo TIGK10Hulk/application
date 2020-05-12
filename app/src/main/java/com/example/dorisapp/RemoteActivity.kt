@@ -1,28 +1,19 @@
 package com.example.dorisapp
 
 import android.content.*
-import android.content.res.ColorStateList
 import android.graphics.Color
-import android.graphics.PorterDuff
 import android.os.Bundle
 import android.os.IBinder
-import android.util.Log
+import android.text.method.ScrollingMovementMethod
 import android.view.View
-import android.widget.Button
 import android.widget.ImageButton
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
-import androidx.core.view.ViewCompat.setBackgroundTintList
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.example.dorisapp.R.color.pink
-import org.jetbrains.anko.toast
+
 
 class RemoteActivity: AppCompatActivity() {
     var bluetoothService: BluetoothLeService? = null
     var isBound = false
-    private val m_TAG = "RemoteActivity :) :)"
 
     var buttonLeft: ImageButton? = null
     var buttonRight: ImageButton? = null
@@ -104,6 +95,7 @@ class RemoteActivity: AppCompatActivity() {
         val intentfilter: IntentFilter = IntentFilter()
         intentfilter.addAction(BLEConstants.ACTION_DATA_WRITTEN)
         intentfilter.addAction(BLEConstants.ACTION_GATT_CONNECTED)
+        intentfilter.addAction(BLEConstants.ACTION_DATA_READ)
         intentfilter.addAction("")
 
         return intentfilter
@@ -117,11 +109,15 @@ class RemoteActivity: AppCompatActivity() {
             when(action) {
                 BLEConstants.ACTION_DATA_WRITTEN -> {
                     val data = intent.getStringExtra(BLEConstants.EXTRA_DATA)
-                    //toast("You have written to robot: " + data.toString())
-                    Log.i(m_TAG, "DATA WRITTEN ${data.toString()}")
+
                 }
                 BLEConstants.ACTION_GATT_CONNECTED -> {
-                    toast("You are now connected to Gatt server on the robot")
+                }
+                BLEConstants.ACTION_DATA_READ -> {
+                    val data = intent.getStringExtra(BLEConstants.EXTRA_DATA)
+                    var textView = findViewById<TextView>(R.id.remote_serial_monitor)
+                    textView.setMovementMethod(ScrollingMovementMethod())
+                    textView.text = "$data \n ${textView.text}"
                 }
             }
         }
@@ -135,29 +131,10 @@ class RemoteActivity: AppCompatActivity() {
             val binder = service as BluetoothLeService.MyLocalBinder
             bluetoothService = binder.getService()
             isBound = true
-            println("Bind connected")
         }
 
         override fun onServiceDisconnected(name: ComponentName) {
-            println("Bind disconnected")
             isBound = false
         }
     }
-
-    fun driveForward() {
-        // Do something
-    }
-
-    fun driveLeft() {
-        // Do something
-    }
-
-    fun driveRight() {
-        // Do something
-    }
-
-    fun driveBackwards() {
-        // Do something
-    }
-
 }
