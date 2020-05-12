@@ -15,7 +15,7 @@ import org.json.JSONObject
 
 fun sendCoordinate(context: Context, coord: Coord){
     val url = "https://us-central1-hulkdoris-4c6eb.cloudfunctions.net/api/positions"
-    val myCoord = Coord(coord.xCoord, coord.yCoord, coord.isCollision, coord.session)
+    val myCoord = Coord(coord.xCoord, coord.yCoord, coord.isCollision, RobotData.session)
     val myJson = Klaxon().toJsonString(myCoord)
     val jsonObject = JSONObject(myJson)
     val queue = Volley.newRequestQueue(context)

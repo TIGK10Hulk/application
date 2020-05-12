@@ -22,6 +22,7 @@ import com.google.android.material.navigation.NavigationView
 class MainActivity : AppCompatActivity() {
     var bluetoothService: BluetoothLeService? = null
     var isBound = false
+    var isSessionActive: Boolean = false
 
     var start : Boolean = true
 
@@ -44,6 +45,8 @@ class MainActivity : AppCompatActivity() {
         startService(intent)
         bindService(intent, myConnection, Context.BIND_AUTO_CREATE )
 
+        //Get latest session
+        HelperFunctions.getSession(this)
     }
 
     fun startAndStop(view: View) {
@@ -52,23 +55,30 @@ class MainActivity : AppCompatActivity() {
         val statusText : TextView = findViewById(R.id.drivingStatusTextView)
         val statusImage : ImageView = findViewById(R.id.dorisStatusImage)
 
-        if(bluetoothService == null){
+        /*
+        if(bluetoothService == null || !bluetoothService!!.m_BLUETOOTH_CONNECTED){
             return
         }
+        */
 
         if (start) {
             /*sendCoordinate(this)*/
             /*val testCoord = Coord(105, 105, false, session = 1)
             sendCoordinate(this, testCoord)*/
-            val startButton : Button = findViewById(R.id.startAndStopButton)
-            startButton.text = "Stop"
+            if(!isSessionActive){
+                RobotData.session += 1
+                isSessionActive = true
+            }
+            println("SESSION::::::: ${RobotData.session}")
+            val startButton : Button = findViewById(R.id.startAndPauseButton)
+            startButton.text = "Pause"
             statusText.text = resources.getString(R.string.driving_status_driving_text_view)
             parkButton.isEnabled = false
             statusImage.setImageDrawable(resources.getDrawable(R.drawable.doris2))
             start = false
             bluetoothService!!.getCharThenWrite(0, 1)
         } else {
-            val stopButton : Button = findViewById(R.id.startAndStopButton)
+            val stopButton : Button = findViewById(R.id.startAndPauseButton)
             stopButton.text = "Start"
             statusText.text = resources.getString(R.string.driving_status_default_text_view)
             statusImage.setImageDrawable(resources.getDrawable(R.drawable.doris2bw))
@@ -79,7 +89,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun park(view: View) {
-
+        isSessionActive = false
         var statusText : TextView = findViewById(R.id.drivingStatusTextView)
         statusText.text = "Going to garage"
     }

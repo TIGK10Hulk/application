@@ -7,5 +7,6 @@ class RobotData {
         var yPosition: Int = 0
         var speed: Int = 0
         var unpushedCoords: ArrayList<Coord>? = ArrayList()
+        var session: Int = 0
     }
 }

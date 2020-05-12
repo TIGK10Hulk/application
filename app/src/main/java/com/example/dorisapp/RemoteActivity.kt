@@ -62,7 +62,7 @@ class RemoteActivity: AppCompatActivity() {
 
     fun reverse(view: View) {
         if(bluetoothService!!.m_BLUETOOTH_CONNECTED) {
-            bluetoothService!!.getCharThenWrite(1,6)
+            bluetoothService!!.getCharThenWrite(1,4)
             setActiveButtonBackground(buttonReverse)
         }
     }
@@ -75,14 +75,14 @@ class RemoteActivity: AppCompatActivity() {
 
     fun turnLeft(view: View){
         if(bluetoothService!!.m_BLUETOOTH_CONNECTED) {
-            bluetoothService!!.getCharThenWrite(1,4)
+            bluetoothService!!.getCharThenWrite(1,2)
             setActiveButtonBackground(buttonLeft)
         }
     }
 
     fun turnRight(view: View) {
         if(bluetoothService!!.m_BLUETOOTH_CONNECTED) {
-            bluetoothService!!.getCharThenWrite(1,5)
+            bluetoothService!!.getCharThenWrite(1,3)
             setActiveButtonBackground(buttonRight)
         }
     }

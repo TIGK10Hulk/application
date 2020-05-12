@@ -4,6 +4,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
+import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.drawable.Drawable
@@ -13,17 +14,21 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.ImageButton
-import android.widget.RelativeLayout
-import android.widget.TextView
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import com.android.volley.Request
+import com.android.volley.Response
+import com.android.volley.toolbox.JsonObjectRequest
+import com.android.volley.toolbox.Volley
+import com.beust.klaxon.JsonObject
+import com.beust.klaxon.Parser
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
+import org.json.JSONException
 
-class HelperFunctions{
+class HelperFunctions {
     companion object {
         fun initializeDrawerListeners(currentLayout: Int, view: View, context: Context){
             //context is needed to allow for intents to be started
@@ -100,5 +105,34 @@ class HelperFunctions{
             relativeLayout.addView(childView)
         }
 
+        fun getSession(context: Context) {
+
+            val queue = Volley.newRequestQueue(context)
+            val url = "https://us-central1-hulkdoris-4c6eb.cloudfunctions.net/api/positions/latest"
+            try {
+                val jsonObjectRequest = JsonObjectRequest(
+                    Request.Method.GET, url, null,
+
+                    // On Success
+                    Response.Listener {
+
+                        val parser: Parser = Parser.default()
+
+                        val stringBuilder: StringBuilder = StringBuilder(it.toString())
+                        val json: JsonObject = parser.parse(stringBuilder) as JsonObject
+                        RobotData.session = json.int("session")!!.toInt()
+
+                    },
+
+                    Response.ErrorListener { error ->
+                        error
+                        println(error)
+                    }
+                )
+                queue.add(jsonObjectRequest)
+            } catch (error: JSONException) {
+                println(error)
+            }
+        }
     }
 }

@@ -110,8 +110,8 @@ class VisualizeActivity : AppCompatActivity() {
                     val parser: Parser = Parser.default()
                     val stringBuilder: StringBuilder = StringBuilder(it.toString())
                     val json: JsonObject = parser.parse(stringBuilder) as JsonObject
-                    val x = json.string("xCoord")
-                    val y = json.string("yCoord")
+                    val x = json.int("xCoord").toString()
+                    val y = json.int("yCoord").toString()
                     val collision = json.boolean("isCollision")
 
                     if (x != null && y != null) {
@@ -199,8 +199,7 @@ class VisualizeActivity : AppCompatActivity() {
 
                     val stringBuilder: StringBuilder = StringBuilder(it.toString())
                     val json: JsonObject = parser.parse(stringBuilder) as JsonObject
-                    val session = json.string("session")
-
+                    val session = json.int("session").toString()
                     if (session != null) {
                         statusText.text = resources.getString(R.string.visualize_coord_success)
                         getCoordArray(session, image, bitMap)
