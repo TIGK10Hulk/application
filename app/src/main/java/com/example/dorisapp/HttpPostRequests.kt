@@ -27,8 +27,9 @@ fun sendCoordinate(context: Context, coord: Coord){
     queue.add(jsonObjectRequest)
 }
 
-fun pushListOfCoordinates(context: Context, coords: ArrayList<Coord>?) {
-    if(RobotData.unpushedCoords == null){
+fun pushListOfCoordinates(context: Context) {
+    if(RobotData.unpushedCoords == null || RobotData.unpushedCoords!!.isEmpty()){
+        println("Returning from pushListOfCoordinates")
         return
     }
 

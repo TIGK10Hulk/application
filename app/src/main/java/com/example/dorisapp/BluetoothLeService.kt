@@ -58,6 +58,8 @@ class BluetoothLeService : Service() {
     var m_BLUETOOTH_CONNECTED = false
     var m_REGISTERAPP_UUID: UUID = UUID.fromString("f564e90a-382c-4872-9d9e-256a81261116")
 
+    lateinit var context: Context
+
     override fun onBind(intent: Intent): IBinder {
         return mBinder
     }
@@ -69,18 +71,17 @@ class BluetoothLeService : Service() {
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
+        context = this
         // Do a periodic task
         mHandler = Handler()
         mRunnable = Runnable {
-            //pushListOfCoordinates(this, RobotData.unpushedCoords)
+            //pushListOfCoordinates(this)
 
             if(!isBluetoothLEConnected()) {
                 init()
             }
-
-            mHandler.postDelayed(mRunnable, 3000)
         }
-        mHandler.postDelayed(mRunnable, 3000)
+        mHandler.postDelayed(mRunnable, 10000)
         //Line 38 needs to be recalled as soon as the previous call has been finished
         //This is going to be the function that will loop and check for new data in the bluetooth stream
 
@@ -191,12 +192,17 @@ class BluetoothLeService : Service() {
             broadcastUpdate(BLEConstants.ACTION_DATA_READ, characteristic)
             println("******'Received: ${characteristic!!.value.contentToString()}")
             //Add new coordinate to list of coordinates not pushed to backend
-            val newCoord = Coord(RobotData.xPosition, RobotData.yPosition, false, 1)
+
+            val newCoord = Coord(RobotData.xPosition, RobotData.yPosition, false, RobotData.session)
+            sendCoordinate(context, newCoord)
+            /*
             if(RobotData.unpushedCoords!!.isEmpty()){
                 RobotData.unpushedCoords!!.add(newCoord)
             } else if(newCoord != RobotData.unpushedCoords!!.last()){
                 RobotData.unpushedCoords!!.add(newCoord)
             }
+
+             */
         }
     }
 
@@ -257,28 +263,8 @@ class BluetoothLeService : Service() {
                 RobotData.speed = byteArr[1].toInt()
             }
             2 -> {
-                when(byteArr[1].toInt()){
-                    1 -> {
-                        RobotData.xPosition += 1
-                    }
-                    2 -> {
-                        RobotData.yPosition += 1
-                    }
-                    3 -> {
-                        RobotData.xPosition -= 1
-                    }
-                    4 -> {
-                        RobotData.yPosition -= 1
-                    }
-                    5 -> {
-                        RobotData.xPosition += 1
-                        RobotData.yPosition += 1
-                    }
-                    6 -> {
-                        RobotData.xPosition -= 1
-                        RobotData.yPosition -= 1
-                    }
-                }
+                RobotData.xPosition += byteArr[1].toInt()
+                RobotData.yPosition += byteArr[2].toInt()
             }
 
             //todo Update backend with new values

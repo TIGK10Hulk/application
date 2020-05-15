@@ -72,7 +72,7 @@ class VisualizeActivity : AppCompatActivity() {
         handler.post(object : Runnable {
             override fun run() {
                 getLatestCoord(image, bitMap)
-                handler.postDelayed(this, 3000)
+                handler.postDelayed(this, 5000)
             }
         })
 

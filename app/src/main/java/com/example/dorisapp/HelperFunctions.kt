@@ -85,10 +85,10 @@ class HelperFunctions {
 
         }
 
-        fun initializeContentView(currentActivity: Int, view: View, layoutInflater: LayoutInflater){
+        fun initializeContentView(currentLayout: Int, view: View, layoutInflater: LayoutInflater){
             //Dynamically include the desired activity xml layout file into the navigation drawer layout
             val relativeLayout = view.findViewById<RelativeLayout>(R.id.rl)
-            val childView = layoutInflater.inflate(currentActivity, null) //this should be the xml corresponding to the current activity
+            val childView = layoutInflater.inflate(currentLayout, null) //this should be the xml corresponding to the current activity
             childView.setLayoutParams(
                 RelativeLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,

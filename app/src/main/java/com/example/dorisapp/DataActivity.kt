@@ -18,7 +18,7 @@ import kotlinx.android.synthetic.main.activity_data.*
 import org.json.JSONException
 
 class DataActivity : AppCompatActivity() {
-
+    lateinit var handler: Handler
     var previousX = ""
     var previousY = ""
 
@@ -40,13 +40,18 @@ class DataActivity : AppCompatActivity() {
 
         getSession()
 
-        val handler = Handler(Looper.getMainLooper())
+        handler = Handler(Looper.getMainLooper())
         handler.post(object : Runnable {
             override fun run() {
                 getLatestCoord()
                 handler.postDelayed(this, 3000)
             }
         })
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        handler.removeCallbacksAndMessages(null)
     }
 
     private fun getLatestCoord() {
