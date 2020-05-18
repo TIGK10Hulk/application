@@ -10,12 +10,17 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.android.volley.Request
 import com.android.volley.Response
+import com.android.volley.toolbox.JsonArrayRequest
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import com.beust.klaxon.JsonArray
 import com.beust.klaxon.JsonObject
+import com.beust.klaxon.Klaxon
 import com.beust.klaxon.Parser
+import org.json.JSONArray
 import org.json.JSONException
+import org.json.JSONObject
+import java.util.logging.Level.parse
 
 
 class VisualizeActivity : AppCompatActivity() {
@@ -151,21 +156,19 @@ class VisualizeActivity : AppCompatActivity() {
         previousY = bitMap.height / 2F
 
         try {
-            val jsonArrayRequest = JsonObjectRequest(Request.Method.GET, url, null,
+            val jsonArrayRequest = JsonArrayRequest(Request.Method.GET, url, null,
 
                 Response.Listener {
-                    val parser: Parser = Parser.default()
-                    val posArray = it.getString("positions")
-                    val stringBuilder: StringBuilder = StringBuilder(posArray)
-                    val array: JsonArray<JsonObject> =
-                        parser.parse(stringBuilder) as JsonArray<JsonObject>
 
-                    array.forEach { i ->
-                        i
-                        val x: Float = i.string("xCoord")!!.toFloat()
-                        val y: Float = i.string("yCoord")!!.toFloat()
-                        val collision = i.boolean("isCollision")
+                    for (i in 0 until it.length()) {
+
+                        val item = it.getJSONObject(i)
+                        val x : Float = item.getString("xCoord").toFloat()
+                        val y : Float = item.getString("yCoord").toFloat()
+                        val collision = item.getBoolean("isCollision")
+
                         paint(x, y, collision, bitMap, image)
+                        println(item)
                     }
 
                 },
