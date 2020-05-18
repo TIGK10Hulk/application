@@ -42,6 +42,9 @@ class RemoteActivity: AppCompatActivity() {
         buttonForward = findViewById(R.id.forwardButton)
         buttonReverse = findViewById(R.id.reverseButton)
 
+        if(bluetoothService != null){
+            bluetoothService!!.getCharThenWrite(0, 2)
+        }
     }
 
     fun drive(view: View){
@@ -112,6 +115,9 @@ class RemoteActivity: AppCompatActivity() {
 
                 }
                 BLEConstants.ACTION_GATT_CONNECTED -> {
+                    if(bluetoothService != null){
+                        bluetoothService!!.getCharThenWrite(0, 2)
+                    }
                 }
                 BLEConstants.ACTION_DATA_READ -> {
                     val data = intent.getStringExtra(BLEConstants.EXTRA_DATA)
