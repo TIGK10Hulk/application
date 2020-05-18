@@ -14,4 +14,5 @@
     <string name="status_text_visualize">Waiting for requests</string>
     <string name="visualize_coord_error">Couldn\'t get coordinates, trying again</string>
     <string name="visualize_coord_success">Plotting route for mower..</string>
+    <string name="visualize_header">Coordinate graph</string>
 </resources>

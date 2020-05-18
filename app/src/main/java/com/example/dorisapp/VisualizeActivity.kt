@@ -13,14 +13,9 @@ import com.android.volley.Response
 import com.android.volley.toolbox.JsonArrayRequest
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
-import com.beust.klaxon.JsonArray
 import com.beust.klaxon.JsonObject
-import com.beust.klaxon.Klaxon
 import com.beust.klaxon.Parser
-import org.json.JSONArray
 import org.json.JSONException
-import org.json.JSONObject
-import java.util.logging.Level.parse
 
 
 class VisualizeActivity : AppCompatActivity() {
@@ -44,8 +39,8 @@ class VisualizeActivity : AppCompatActivity() {
             this
         ) //Initialize button listeners for navigation system
 
-        var toolbarTitle = findViewById<TextView>(R.id.toolbarTitle)
-        toolbarTitle.text = "Coordinate graph"
+        val toolbarTitle = findViewById<TextView>(R.id.toolbarTitle)
+        toolbarTitle.text = resources.getString(R.string.visualize_header)
 
         val image = setImageView()
         val bitMap = setBitMap(image)
@@ -132,7 +127,6 @@ class VisualizeActivity : AppCompatActivity() {
                 },
 
                 Response.ErrorListener { error ->
-                    error
                     println(error)
                     statusText.text = resources.getString(R.string.visualize_coord_error)
 
@@ -174,7 +168,6 @@ class VisualizeActivity : AppCompatActivity() {
                 },
 
                 Response.ErrorListener { error ->
-                    error
                     println(error)
 
                 })
@@ -212,7 +205,6 @@ class VisualizeActivity : AppCompatActivity() {
                 },
 
                 Response.ErrorListener { error ->
-                    error
                     println(error)
                     statusText.text = resources.getString(R.string.visualize_coord_error)
 
@@ -233,8 +225,8 @@ class VisualizeActivity : AppCompatActivity() {
 
         val origoX = bitMap.width / 2F
         val origoY = bitMap.height / 2F
-        var fixedX = origoX + (x * 6)
-        var fixedY = origoY - (y * 6)
+        val fixedX = origoX + (x * 6)
+        val fixedY = origoY - (y * 6)
 
         println("x: $x")
         println("y: $y")
