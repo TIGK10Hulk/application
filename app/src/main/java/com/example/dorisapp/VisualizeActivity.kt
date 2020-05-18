@@ -77,7 +77,7 @@ class VisualizeActivity : AppCompatActivity() {
         handler.post(object : Runnable {
             override fun run() {
                 getLatestCoord(image, bitMap)
-                handler.postDelayed(this, 5000)
+                handler.postDelayed(this, 1000)
             }
         })
 
@@ -165,7 +165,7 @@ class VisualizeActivity : AppCompatActivity() {
                         val item = it.getJSONObject(i)
                         val x : Float = item.getString("xCoord").toFloat()
                         val y : Float = item.getString("yCoord").toFloat()
-                        val collision = item.getBoolean("isCollision")
+                        val collision : Boolean = item.getBoolean("isCollision")
 
                         paint(x, y, collision, bitMap, image)
                         println(item)
