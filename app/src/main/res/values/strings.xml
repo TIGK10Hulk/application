@@ -1,3 +1,18 @@
 <resources>
     <string name="app_name">DorisApp</string>
+    <string name="start_button">Start</string>
+    <string name="park_button">Park</string>
+    <string name="visualized_route_button">Visualized route</string>
+    <string name="route_in_data_button">Route in data</string>
+    <string name="collisionsButton">Collisions</string>
+    <string name="arrow_pointing_upward">arrow pointing upward</string>
+    <string name="arrow_pointing_downward">arrow pointing downward</string>
+    <string name="arrow_pointing_to_the_left">arrow pointing to the left</string>
+    <string name="arrow_pointing_to_the_right">arrow pointing to the right</string>
+    <string name="driving_status_default_text_view"> Doris is idle</string>
+    <string name="driving_status_driving_text_view">Doris is driving</string>
+    <string name="status_text_visualize">Waiting for requests</string>
+    <string name="visualize_coord_error">Couldn\'t get coordinates, trying again</string>
+    <string name="visualize_coord_success">Plotting route for mower..</string>
+    <string name="visualize_header">Coordinate graph</string>
 </resources>
